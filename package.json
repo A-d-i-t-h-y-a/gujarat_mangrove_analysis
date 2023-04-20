@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "leaflet-choropleth": "^1.1.4",
+    "leaflet-draw": "^1.0.4"
+  }
+}
