@@ -77,7 +77,9 @@
     <div><h2 class="text-center">Map</h2></div>
     <div id="map" class="container rounded"></div>
     <div id="lat_lon" class="text-center mt-4"></div>
-    <!-- <div id="imgcont"></div> -->
+    <div id="imgcont">
+      <img src="{{ url_for('static', filename = 'my_plot.png') }}" class="d-block mx-auto">
+    </div>
     <form id="my-form" method="POST" class="d-none">
         <input type="hidden" name="lmin" id="lat_min" value="">
         <input type="hidden" name="lmax" id="lat_max" value="">

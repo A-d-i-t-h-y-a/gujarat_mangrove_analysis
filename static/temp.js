@@ -77,69 +77,14 @@ map.on('draw:created', function (e) {
 
     document.getElementById("lat_lon").innerHTML = `The Selected values range is <br>Latitude = (${lat_min}, ${lat_max})<br>Longitude = (${lng_min}, ${lng_max})`
 
-    // let cont = document.getElementById("imgcont");
-    // let img = document.createElement('img');
-    // setTimeout(() => {
-    //   img.src = "/my_flask_route";
-    //   cont.appendChild(img);  
-    // }, 5000);
+    let cont = document.getElementById("imgcont");
+    let img = document.createElement('img');
+    setTimeout(() => {
+      img.src = "/";
+      cont.appendChild(img);  
+    }, 5000);
 });
 
-var geojsonData = {
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "properties": {
-        "name": "Feature 1",
-        "value": 10
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [-121.45339965820311, 38.56648249281815],
-            [-121.43821716308594, 38.55993434040813],
-            [-121.44130706787108, 38.55159601244628],
-            [-121.45938873291017, 38.55159601244628],
-            [-121.45339965820311, 38.56648249281815]
-          ]
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "name": "Feature 2",
-        "value": 20
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [-121.39556884765625, 38.57303057421044],
-            [-121.37886047363281, 38.5646945448267],
-            [-121.38641357421874, 38.55814657500271],
-            [-121.40243530273439, 38.56242290374115],
-            [-121.39556884765625, 38.57303057421044]
-          ]
-        ]
-      }
-    }
-  ]
-};
-
-var geojsonLayer = L.choropleth(geojsonData, {
-  valueProperty: 'value',
-  scale: ['#ffffb2', '#b10026'], // Add a color palette
-  steps: 5,
-  mode: 'q',
-  style: {
-    color: '#fff',
-    weight: 2,
-    fillOpacity: 0.8
-  }
-}).addTo(map);
 
 
 
