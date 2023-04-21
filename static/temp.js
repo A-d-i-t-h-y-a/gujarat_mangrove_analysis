@@ -1,4 +1,4 @@
-var map = L.map('map').setView([100.505, -0.09], 13);
+var map = L.map('map').setView([15.805, 80.9], 10);
 
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 maxZoom: 19,
@@ -18,15 +18,15 @@ var latlng = L.latLng(15.7, 80.85);
 // marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
 // // circle.bindPopup("I am a circle.");
 // polygon.bindPopup("I am a polygon.");
-var popup = L.popup()
-    .setLatLng([15.713, 80.95])
-    .setContent("You can start selecting from here")
-    .openOn(map);
+// var popup = L.popup()
+    // .setLatLng([15.713, 80.95])
+    // .setContent("You can start selecting from here")
+    // .openOn(map);
     // var tooltip = L.tooltip(latlng, {content: 'Hello world!<br />This is a nice tooltip.'})
     // .addTo(map);
-    var corner1 = L.latLng(15.712, 80.927),
-corner2 = L.latLng(15.774, 81.125),
-bounds = L.latLngBounds(corner1, corner2);
+// var corner1 = L.latLng(15.712, 80.927),
+// corner2 = L.latLng(15.774, 81.125),
+// bounds = L.latLngBounds(corner1, corner2);
 
 // var popup = L.popup();
 
@@ -50,7 +50,8 @@ var drawControl = new L.Control.Draw({
     polygon: false,
     circle: false,
     marker: false,
-    polyline: false
+    polyline: false,
+    circlemarker: false
   },
   edit: {
     featureGroup: drawnItems
@@ -59,8 +60,10 @@ var drawControl = new L.Control.Draw({
 
 // when a rectangle is drawn, add it to the drawnItems feature group
 map.on('draw:created', function (e) {
-    var layer = e.layer;
-    drawnItems.addLayer(layer);
+  var layer = e.layer;
+  drawnItems.addLayer(layer);
+  drawControl.remove();
+  drawControl.addTo(map);
 
     // get the coordinates of the selected area
     let coordinates = layer.getLatLngs();
@@ -68,21 +71,49 @@ map.on('draw:created', function (e) {
     let lat_max = coordinates[0][1]["lat"];
     let lng_min = coordinates[0][0]["lng"];
     let lng_max = coordinates[0][2]["lng"];
-    document.getElementById("lat_min").value = lat_min;
-    document.getElementById("lat_max").value = lat_max;
-    document.getElementById("lng_min").value = lng_min;
-    document.getElementById("lng_max").value = lng_max;
+    // document.getElementById("lat_min").value = lat_min;
+    // document.getElementById("lat_max").value = lat_max;
+    // document.getElementById("lng_min").value = lng_min;
+    // document.getElementById("lng_max").value = lng_max;
+    let data = {
+      lat_min: lat_min,
+      lat_max: lat_max,
+      lng_min: lng_min,
+      lng_max: lng_max
+    }
+    console.log(data)
+    $(document).ready(function (){
+      $.ajax({
+        type: "POST",
+        url: "/my_flask_route",
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        success: function(response) {
+          const img = document.createElement('img');
+          img.src = 'data:image/png;base64,' + response.image;
+      
+          // // Add the image to the document body
+          document.getElementById("imgcont").appendChild(img);
+          // console.log(response)
+        }
+      });
 
-    document.getElementById("my-form").submit();
+    })
+    // document.getElementById("my-form").submit();
 
     document.getElementById("lat_lon").innerHTML = `The Selected values range is <br>Latitude = (${lat_min}, ${lat_max})<br>Longitude = (${lng_min}, ${lng_max})`
 
-    let cont = document.getElementById("imgcont");
-    let img = document.createElement('img');
-    setTimeout(() => {
-      img.src = "/";
-      cont.appendChild(img);  
-    }, 5000);
+    // let cont = document.getElementById("imgcont");
+    // let img = document.createElement('img');
+    // setTimeout(() => {
+    //     // img.src = "{{ url_for('static', filename = 'my_plot.png') }}";
+    //     cont.appendChild(img);  
+    // }, 5000);
+    //   let img = new Image();
+    //   img.src = "/";
+    //   img.onload = function() {
+    //     // Do something with the image
+    // };
 });
 
 
