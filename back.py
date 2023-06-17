@@ -38,12 +38,12 @@ def my_flask_function():
                         time=time_range,
                         output_crs='EPSG:6933',
                         resolution=(-30, 30))
+            dataset = ds
+            dataset =  odc.algo.to_f32(dataset)
+            band_diff = dataset.B08_10m - dataset.B04_10m
+            band_sum = dataset.B08_10m + dataset.B04_10m
         except Exception as e:
-            return "Error"
-        dataset = ds
-        dataset =  odc.algo.to_f32(dataset)
-        band_diff = dataset.B08_10m - dataset.B04_10m
-        band_sum = dataset.B08_10m + dataset.B04_10m
+            return jsonify({'error': "No Data Found"})
 
         # Calculate NDVI and store it as a measurement in the original dataset
         ndvi = band_diff / band_sum
@@ -52,7 +52,7 @@ def my_flask_function():
         img_buffer = io.BytesIO()
         plt.savefig(img_buffer, format='png')
         img_buffer.seek(0)
-        plt.savefig('./static/my_plot.png')
+        # plt.savefig('./static/my_plot.png')
         # Serve the image file in the Flask app
         img_base64 = base64.b64encode(img_buffer.getvalue()).decode()
 

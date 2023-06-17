@@ -37,6 +37,10 @@
     #map {
       height: 500px;
     }
+    img{
+      display: block;
+      margin: 0px auto;
+    }
   </style>
 
   <title>Document</title>
@@ -48,40 +52,44 @@
     <div id="filter" class="collapse">
       <div class="row input-group mb-3 mx-0">
         <span class="col-lg-1 input-group-text">From Date</span>
-        <input type="date" class="col-lg-5 form-control" name="fromdate" value={filter.fromdate}
-          onChange={handleonChange} />
+        <input type="date" class="col-lg-5 form-control" name="fromdate" value="2022-01-01"
+          onchange="handleOnChange(event)"/>
         <span class="input-group-text col-lg-1">To Date</span>
-        <input type="date" class="col-lg-5 form-control" name="todate" value={filter.todate}
-          onChange={handleonChange} />
+        <input type="date" class="col-lg-5 form-control" name="todate" value="2023-02-15"
+          onchange="handleOnChange(event)"/>
       </div>
       <div class="row input-group my-4 mx-0">
-        <span class="col-lg-1 input-group-text">Event Type</span>
-        <select class="form-select col-lg-5 me-sm-2" id="inputGroupSelect01" name="etype" value={filter.etype}
-          onChange={handleonChange}>
-          <option selected value="">None</option>
-          <option>Offline</option>
-          <option>Online</option>
+        <span class="col-lg-1 input-group-text">Calculation</span>
+        <select class="form-select col-lg-5 me-sm-2" id="calc" name="calc"
+          onchange="handleOnChange(event)">
+          <option selected value = "">NDVI</option>
+          <option>NDWI</option>
         </select>
-        <span class="col-lg-1 input-group-text">Venue</span>
-        <select class="form-select col-lg-5" id="inputGroupSelect02" name="venue" value={filter.venue}
-          onChange={handleonChange}>
-          <option selected value="">None</option>
-          <option>Auditorium</option>
-          <option>Mini Auditorium</option>
-        </select>
+      </div>
+      <div class="row input-group my-4 mx-0">
+        <span class="col-lg-1 input-group-text">Latitude</span>
+        <input type="text" class="form-control" id = "latitude" aria-labelledby="latitude" onchange="handleOnChange(event)">
+        <span class="col-lg-1 input-group-text">Longitude</span>
+        <input type="text" class="form-control" id = "longitude" aria-labelledby="longitude" onchange="handleOnChange(event)">
+        <span class="col-lg-1 input-group-text">Buffer</span>
+        <input type="text" class="form-control" id = "buffer" aria-labelledby="buffer" onchange="handleOnChange(event)">
       </div>
     </div>
     <div>
       <h2 class="text-center">Map</h2>
     </div>
-    <div id="map" class="rounded" onclick="onMapClick()"></div>
+    <div id="map" class="rounded"></div>
     <div id="lat_lon" class="text-center mt-4"></div>
     <div id="imgcont">
       <!-- <img src="{{ url_for('static', filename = 'my_plot.png') }}" class="d-block mx-auto"> -->
     </div>
+    <!-- <p id="progress-bar"></p> -->
+    <div id="loader" class="spinner-border text-primary d-block mx-auto my-5 d-none" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
   </div>
-  <script src="https://code.jquery.com/jquery-3.6.4.min.js"
-    integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+  <!-- <script src="https://code.jquery.com/jquery-3.6.4.min.js"
+    integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script> -->
   <script src="{{ url_for('static', filename = 'temp.js') }}"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"
     integrity="sha384-zYPOMqeu1DAVkHiLqWBUTcbYfZ8osu1Nd6Z89ify25QV9guujx43ITvfi12/QExE"

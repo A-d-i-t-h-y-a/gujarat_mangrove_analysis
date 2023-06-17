@@ -58,6 +58,10 @@ var drawControl = new L.Control.Draw({
   }
 }).addTo(map);
 
+function handleOnChange(e){
+  console.log(e.target.value)
+}
+
 // when a rectangle is drawn, add it to the drawnItems feature group
 map.on('draw:created', function (e) {
   var layer = e.layer;
@@ -67,53 +71,71 @@ map.on('draw:created', function (e) {
 
     // get the coordinates of the selected area
     let coordinates = layer.getLatLngs();
+    console.log(coordinates)
     let lat_min = coordinates[0][0]["lat"];
     let lat_max = coordinates[0][1]["lat"];
     let lng_min = coordinates[0][0]["lng"];
     let lng_max = coordinates[0][2]["lng"];
-    // document.getElementById("lat_min").value = lat_min;
-    // document.getElementById("lat_max").value = lat_max;
-    // document.getElementById("lng_min").value = lng_min;
-    // document.getElementById("lng_max").value = lng_max;
     let data = {
       lat_min: lat_min,
       lat_max: lat_max,
       lng_min: lng_min,
       lng_max: lng_max
     }
-    console.log(data)
-    $(document).ready(function (){
-      $.ajax({
-        type: "POST",
-        url: "/my_flask_route",
-        data: JSON.stringify(data),
-        contentType: "application/json",
-        success: function(response) {
-          const img = document.createElement('img');
-          img.src = 'data:image/png;base64,' + response.image;
-      
-          // // Add the image to the document body
-          document.getElementById("imgcont").appendChild(img);
-          // console.log(response)
-        }
-      });
+    // console.log(data)
+    // $(document).ready(function (){
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", "/my_flask_route", true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.responseType = "json";
 
-    })
+      // xhr.onprogress = function (e){
+      //   // $("#progress-bar").html("In Progress")
+      //   console.log(e)
+      //   console.log("In Progress")
+      // }
+      document.getElementById("loader").classList.remove("d-none")
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.UNSENT) {
+          console.log("In Progress");
+        } else if (xhr.readyState === XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            // Process the response here
+            if(xhr.response.error){
+              document.getElementById("loader").classList.add("d-none")
+              document.getElementById('imgcont').innerHTML = xhr.response.status;
+            }
+            else{
+              document.getElementById("loader").classList.add("d-none")
+              const img = document.createElement('img');
+              img.src = 'data:image/png;base64,' + xhr.response.image;
+        
+              // Add the image element to the document body
+              document.getElementById('imgcont').appendChild(img);
+            }
+          }
+        }
+      };
+      // xhr.addEventListener("load", function(event) {
+      // xhr.onload = function (){
+      //   if (xhr.status === 200) {
+      //     // Create an image element and set its source to the base64 encoded PNG image
+      //     const img = document.createElement('img');
+      //     img.src = 'data:image/png;base64,' + xhr.response.image;
+    
+      //     // Add the image element to the document body
+      //     document.getElementById('imgcont').appendChild(img);
+    
+      //     // Hide the progress bar
+      //     // $("#progress-bar").hide(1000);
+      //   }
+      // };
+      xhr.send(JSON.stringify(data));
+
+    // })
     // document.getElementById("my-form").submit();
 
     document.getElementById("lat_lon").innerHTML = `The Selected values range is <br>Latitude = (${lat_min}, ${lat_max})<br>Longitude = (${lng_min}, ${lng_max})`
-
-    // let cont = document.getElementById("imgcont");
-    // let img = document.createElement('img');
-    // setTimeout(() => {
-    //     // img.src = "{{ url_for('static', filename = 'my_plot.png') }}";
-    //     cont.appendChild(img);  
-    // }, 5000);
-    //   let img = new Image();
-    //   img.src = "/";
-    //   img.onload = function() {
-    //     // Do something with the image
-    // };
 });
 
 
