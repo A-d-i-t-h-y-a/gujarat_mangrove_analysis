@@ -1,0 +1,107 @@
+creation_dt: '2023-03-04'
+extent:
+  center_dt: '2023-03-04 05:33:14.4981250Z'
+  coord:
+    ll:
+      lat: 71.96183275372113
+      lon: 20.59232031088988
+    lr:
+      lat: 74.16900497845934
+      lon: 20.617026814645115
+    ul:
+      lat: 71.91715987767058
+      lon: 22.709150929535355
+    ur:
+      lat: 74.15676443131146
+      lon: 22.73666134384384
+  from_dt: '2023-03-04 05:33:14.4981250Z'
+  to_dt: '2023-03-04 05:33:14.4981250Z'
+format:
+  name: GeoTiff
+grid_spatial:
+  projection:
+    geo_ref_points:
+      ll:
+        x: 183285
+        'y': 2279985
+      lr:
+        x: 413415
+        'y': 2279985
+      ul:
+        x: 183285
+        'y': 2514615
+      ur:
+        x: 413415
+        'y': 2514615
+    spatial_reference: >-
+      PROJCS["WGS 84 / UTM zone 43N",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS
+      84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",75],PARAMETER["scale_factor",0.9996],PARAMETER["false_easting",500000],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","32643"]]
+id: 0eae3e9a-6325-4282-90ea-ae45a0e6c979
+instrument:
+  name: OLI_TIRS
+lineage:
+  source_datasets: {}
+measurements:
+  QA_PIXEL:
+    layer: 1
+    path: /home/adithya/Project School/Lansat/LC08_L2SP_148045_20230304_20230316_02_T1/LC08_L2SP_148045_20230304_20230316_02_T1_QA_PIXEL.TIF
+  QA_RADSAT:
+    layer: 1
+    path: /home/adithya/Project School/Lansat/LC08_L2SP_148045_20230304_20230316_02_T1/LC08_L2SP_148045_20230304_20230316_02_T1_QA_RADSAT.TIF
+  SR_B1:
+    layer: 1
+    path: /home/adithya/Project School/Lansat/LC08_L2SP_148045_20230304_20230316_02_T1/LC08_L2SP_148045_20230304_20230316_02_T1_SR_B1.TIF
+  SR_B2:
+    layer: 1
+    path: /home/adithya/Project School/Lansat/LC08_L2SP_148045_20230304_20230316_02_T1/LC08_L2SP_148045_20230304_20230316_02_T1_SR_B2.TIF
+  SR_B3:
+    layer: 1
+    path: /home/adithya/Project School/Lansat/LC08_L2SP_148045_20230304_20230316_02_T1/LC08_L2SP_148045_20230304_20230316_02_T1_SR_B3.TIF
+  SR_B4:
+    layer: 1
+    path: /home/adithya/Project School/Lansat/LC08_L2SP_148045_20230304_20230316_02_T1/LC08_L2SP_148045_20230304_20230316_02_T1_SR_B4.TIF
+  SR_B5:
+    layer: 1
+    path: /home/adithya/Project School/Lansat/LC08_L2SP_148045_20230304_20230316_02_T1/LC08_L2SP_148045_20230304_20230316_02_T1_SR_B5.TIF
+  SR_B6:
+    layer: 1
+    path: /home/adithya/Project School/Lansat/LC08_L2SP_148045_20230304_20230316_02_T1/LC08_L2SP_148045_20230304_20230316_02_T1_SR_B6.TIF
+  SR_B7:
+    layer: 1
+    path: /home/adithya/Project School/Lansat/LC08_L2SP_148045_20230304_20230316_02_T1/LC08_L2SP_148045_20230304_20230316_02_T1_SR_B7.TIF
+  SR_QA_AEROSOL:
+    layer: 1
+    path: /home/adithya/Project School/Lansat/LC08_L2SP_148045_20230304_20230316_02_T1/LC08_L2SP_148045_20230304_20230316_02_T1_SR_QA_AEROSOL.TIF
+  ST_ATRAN:
+    layer: 1
+    path: /home/adithya/Project School/Lansat/LC08_L2SP_148045_20230304_20230316_02_T1/LC08_L2SP_148045_20230304_20230316_02_T1_ST_ATRAN.TIF
+  ST_B10:
+    layer: 1
+    path: /home/adithya/Project School/Lansat/LC08_L2SP_148045_20230304_20230316_02_T1/LC08_L2SP_148045_20230304_20230316_02_T1_ST_B10.TIF
+  ST_CDIST:
+    layer: 1
+    path: /home/adithya/Project School/Lansat/LC08_L2SP_148045_20230304_20230316_02_T1/LC08_L2SP_148045_20230304_20230316_02_T1_ST_CDIST.TIF
+  ST_DRAD:
+    layer: 1
+    path: /home/adithya/Project School/Lansat/LC08_L2SP_148045_20230304_20230316_02_T1/LC08_L2SP_148045_20230304_20230316_02_T1_ST_DRAD.TIF
+  ST_EMIS:
+    layer: 1
+    path: /home/adithya/Project School/Lansat/LC08_L2SP_148045_20230304_20230316_02_T1/LC08_L2SP_148045_20230304_20230316_02_T1_ST_EMIS.TIF
+  ST_EMSD:
+    layer: 1
+    path: /home/adithya/Project School/Lansat/LC08_L2SP_148045_20230304_20230316_02_T1/LC08_L2SP_148045_20230304_20230316_02_T1_ST_EMSD.TIF
+  ST_QA:
+    layer: 1
+    path: /home/adithya/Project School/Lansat/LC08_L2SP_148045_20230304_20230316_02_T1/LC08_L2SP_148045_20230304_20230316_02_T1_ST_QA.TIF
+  ST_TRAD:
+    layer: 1
+    path: /home/adithya/Project School/Lansat/LC08_L2SP_148045_20230304_20230316_02_T1/LC08_L2SP_148045_20230304_20230316_02_T1_ST_TRAD.TIF
+  ST_URAD:
+    layer: 1
+    path: /home/adithya/Project School/Lansat/LC08_L2SP_148045_20230304_20230316_02_T1/LC08_L2SP_148045_20230304_20230316_02_T1_ST_URAD.TIF
+platform:
+  code: LANDSAT_8
+processing_level: L2SP
+product:
+  name: landsat_8_c2_l2
+product_type: LaSRC
