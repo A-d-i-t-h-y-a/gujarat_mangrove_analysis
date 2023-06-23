@@ -99,7 +99,7 @@ def my_flask_function():
         data = list(map(lambda x:round(x, 4), masked_ds_mean.values.tolist()))
         plt.figure(figsize=(8, 8))
         subset = index.isel(time=[0, -1])
-        subset.plot(col='time', vmin=0, vmax=1, col_wrap=3)
+        subset.plot(col='time', vmin=0, vmax=1, col_wrap=2)
         img_buffer = io.BytesIO()
         plt.savefig(img_buffer, format='png')
         img_buffer.seek(0)

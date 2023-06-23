@@ -38,13 +38,90 @@
     #map {
       height: 500px;
       width: 100%;
-      transition: width 0.5s ease;
+      transition: width 1s ease;
     }
 
     img {
       display: block;
       margin: 0px auto;
     }
+
+    /* .modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 600px;
+      animation: modalOpen 0.3s ease-out;
+    }
+
+    @keyframes modalOpen {
+      0% {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    [id^="openModalBtn"] {
+      cursor: pointer;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .fade-out {
+      opacity: 1;
+      transition: opacity 0.3s;
+    }
+
+    .fade-out:hover {
+      opacity: 0.5;
+    }
+
+    .maximize-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 48px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    [id^="openModalBtn"]:hover .maximize-icon {
+      opacity: 0.5;
+    } */
+
 
     /* .heading{
       display: inline-block;
@@ -56,6 +133,14 @@
 </head>
 
 <body>
+  <!-- <button id="openModalBtn">Open Modal</button> -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Modal Title</h2>
+      <img id="max_img"></img>
+    </div>
+  </div>
   <header>
     <div style="display: flex; justify-content: center; padding: 10px 0px; background-color: aquamarine;">
       <h2>Gujarat Mangrove Analysis</h2>
@@ -99,23 +184,24 @@
     <div style="display: flex; flex-direction: row;">
       <div id="map" class="rounded"></div>
       <div id="mgr" class="ms-5" style="width: 50%; display: none;">
-        <canvas id="chartCanvas" style="height: 100%; width: 100%;"></canvas>
+        <canvas id="chartCanvas" style="height: 200%; width: 200%;"></canvas>
       </div>
     </div>
     <!-- <div > -->
     <!-- <div class="d-flex" style="width: 50%; height: 100%;"> -->
-    <table class="table">
+    <table class="table my-5">
       <thead id="thead">
-        
+
       </thead>
       <tbody id="tbody">
-        
+
       </tbody>
     </table>
     <!-- </div> -->
     <!-- </div> -->
     <!-- <div id="lat_lon" class="text-center mt-4"></div> -->
-    <div id="imgcont" class="d-flex flex-row flex-wrap justify-content-between h-5" style="margin: 1.5rem 0rem;">
+    <div id="imgcont" class="d-flex flex-row flex-wrap justify-content-between h-5"
+      style="margin: 1.5rem 0rem;">
       <!-- <img src="{{ url_for('static', filename = 'my_plot.png') }}" class="d-block mx-auto"> -->
 
     </div>
