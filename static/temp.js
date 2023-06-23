@@ -3,73 +3,9 @@ let td = document.getElementsByName("todate")[0];
 let today = new Date().toISOString().split("T")[0];
 td.max = today;
 fd.max = today;
-// const initialData = {
-//   labels: [],
-//   datasets: [],
-// };
 
-// // Create a Chart.js line chart
-// const ctx = document.getElementById('chartCanvas').getContext('2d');
-// const chart = new Chart(ctx, {
-//   type: 'line',
-//   data: initialData,
-// });
-
-// // Function to append new data to the chart
-// function appendData(x, y, color) {
-//   // Check if a dataset already exists
-//   if (chart.data.datasets.length === 0) {
-//     // Create a new dataset
-//     chart.data.datasets.push({
-//       label: 'Line Plot',
-//       data: [],
-//       borderColor: color,
-//       fill: false,
-//     });
-//   }
-
-//   // Get the first dataset
-//   const dataset = chart.data.datasets[0];
-
-//   // Add the new data point
-//   dataset.data.push({ x, y });
-
-//   // Update the chart
-//   chart.update();
-// }
-
-// let labels = [];
-
-// const chartOptions = {
-//   responsive: true,
-//   interaction: {
-//     intersect: false,
-//     mode: 'index'
-//   },
-//   scales: {
-//     x: {
-//       display: true
-//     },
-//     y: {
-//       display: true,
-//       suggestedMin: 0,
-//       suggestedMax: 100
-//     }
-//   }
-// };
 let chart, data, labels;
 
-// data = {
-//   labels: labels,
-//   datasets: []
-// };
-// let ctv = document.getElementById('chartCanvas');
-// Create the chart
-// chart = new Chart(ctv, {
-//   type: 'line',
-//   data: data,
-//   options: chartOptions
-// });
 let map = L.map('map').setView([15.805, 80.9], 10);
 
 let taskExecuted = false;
@@ -107,11 +43,6 @@ function performTask(lab) {
         x: {
           display: true
         }
-        // y: {
-        //   display: true,
-        //   suggestedMin: -1,
-        //   suggestedMax: 1
-        // }
       }
     };
 
@@ -143,53 +74,13 @@ function appendData(newData, lab) {
   chart.update();
 }
 
-// setTimeout(() => {
-//     appendData([70, 61, 85, 83, 58, 59, 40]);
-//   }, 1000);
-
-// console.log(td.max)
-// function handleOnChange(){
-
-//   // console.log(todate, fromdate)
-// }
-
-
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
-// L.marker([51.5, -0.09]).addTo(map)
-// .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
-// .openPopup();
-// var marker = L.marker([15.7, 80.85]).addTo(map);
+
 let latlng = L.latLng(15.7, 80.85);
-// var polygon = L.polygon([
-// [51.509, -0.08],
-// [55.503, -0.08],
-// [51.509, -0.04],
-// [55.503, -0.04]
-// ]).addTo(map);
-// marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
-// // circle.bindPopup("I am a circle.");
-// polygon.bindPopup("I am a polygon.");
-// var popup = L.popup()
-// .setLatLng([15.713, 80.95])
-// .setContent("You can start selecting from here")
-// .openOn(map);
-// var tooltip = L.tooltip(latlng, {content: 'Hello world!<br />This is a nice tooltip.'})
-// .addTo(map);
-// var corner1 = L.latLng(15.712, 80.927),
-// corner2 = L.latLng(15.774, 81.125),
-// bounds = L.latLngBounds(corner1, corner2);
 
-// var popup = L.popup();
-
-// function onMapClick(e) {
-//     popup
-//         .setLatLng(e.latlng)
-//         .setContent("You clicked the map at " + e.latlng.toString())
-//         .openOn(map);
-// }
 let drawnItems = L.featureGroup().addTo(map);
 
 // create a Rectangle draw handler
@@ -211,29 +102,6 @@ let drawControl = new L.Control.Draw({
     featureGroup: drawnItems
   }
 }).addTo(map);
-
-// Example using the Fetch API
-// function updateGraph() {
-//   fetch('/update-graph', {
-//     method: 'POST',
-//     // Include any necessary data or parameters for the action
-//     // body: JSON.stringify({ key: value })
-//   })
-//     .then(response => response.json())
-//     .then(data => {
-//       // Handle the response data
-//       // Update the graph using the new data or URL
-//       // For example, update the 'src' attribute of the <img> tag
-//       const im = document.createElement('img');
-//       const img = document.getElementById('graph-img');
-//       im.src = 'data:image/png;base64,' + data.graph_url;
-//       img.appendChild(im);
-//     })
-//     .catch(error => {
-//       // Handle any error that occurred during the request
-//       console.error('Error:', error);
-//     });
-// }
 
 
 function getRandomColor() {
@@ -262,12 +130,6 @@ function send_req(col, send_data) {
   xhr.open("POST", "/my_flask_route", true);
   xhr.setRequestHeader("Content-Type", "application/json");
   xhr.responseType = "json";
-
-  // xhr.onprogress = function (e){
-  //   // $("#progress-bar").html("In Progress")
-  //   console.log(e)
-  //   console.log("In Progress")
-  // }
   document.getElementById("loader").classList.remove("d-none");
   // document.getElementById("loader").scrollIntoView({ behavior: "smooth", block: "end" });
   window.scrollTo(0, document.body.scrollHeight);
@@ -375,20 +237,6 @@ function send_req(col, send_data) {
       }
     }
   };
-  // xhr.addEventListener("load", function(event) {
-  // xhr.onload = function (){
-  //   if (xhr.status === 200) {
-  //     // Create an image element and set its source to the base64 encoded PNG image
-  //     const img = document.createElement('img');
-  //     img.src = 'data:image/png;base64,' + xhr.response.image;
-
-  //     // Add the image element to the document body
-  //     document.getElementById('imgcont').appendChild(img);
-
-  //     // Hide the progress bar
-  //     // $("#progress-bar").hide(1000);
-  //   }
-  // };
   xhr.send(JSON.stringify(send_data));
 }
 
@@ -427,94 +275,10 @@ function OnChange() {
       }
       console.log(data)
       send_req(col, data)
-      // setTimeout(() => {
-      //   appendData('2023-06-01', 4, 'blue');
-      // }, 1000);
-
-      // setTimeout(() => {
-      //   appendData('2023-06-02', 6, 'green');
-      // }, 2000);
-
-      // setTimeout(() => {
-      //   appendData('2023-06-03', 2, 'red');
-      // }, 3000);
-      // console.log("Draw Color", )
-      // const xhr = new XMLHttpRequest();
-      // xhr.open("POST", "/my_flask_route", true);
-      // xhr.setRequestHeader("Content-Type", "application/json");
-      // xhr.responseType = "json";
-
-      // // xhr.onprogress = function (e){
-      // //   // $("#progress-bar").html("In Progress")
-      // //   console.log(e)
-      // //   console.log("In Progress")
-      // // }
-      // document.getElementById("loader").classList.remove("d-none");
-      // // document.getElementById("loader").scrollIntoView({ behavior: "smooth", block: "end" });
-      // window.scrollTo(0, document.body.scrollHeight);
-      // xhr.onreadystatechange = function () {
-      //   if (xhr.readyState === XMLHttpRequest.UNSENT) {
-      //     console.log("In Progress");
-      //   } else if (xhr.readyState === XMLHttpRequest.DONE) {
-      //     if (xhr.status === 200) {
-      //       // Process the response here
-      //       if (xhr.response.error) {
-      //         document.getElementById("loader").classList.add("d-none")
-      //         document.getElementById('imgcont').innerHTML = xhr.response.status;
-      //       }
-      //       else {
-      //         document.getElementById("loader").classList.add("d-none")
-      //         const img = document.createElement('img');
-      //         img.src = 'data:image/png;base64,' + xhr.response.image;
-      //         img.style.width = "100%";
-      //         img.style.border = `2px solid ${col}`;
-      //         img.style.margin = "2rem 0rem";
-      //         img.style.borderRadius = "10px"
-
-      //         // Add the image element to the document body
-      //         document.getElementById('imgcont').appendChild(img);
-      //       }
-      //     }
-      //   }
-      // };
-      // // xhr.addEventListener("load", function(event) {
-      // // xhr.onload = function (){
-      // //   if (xhr.status === 200) {
-      // //     // Create an image element and set its source to the base64 encoded PNG image
-      // //     const img = document.createElement('img');
-      // //     img.src = 'data:image/png;base64,' + xhr.response.image;
-
-      // //     // Add the image element to the document body
-      // //     document.getElementById('imgcont').appendChild(img);
-
-      // //     // Hide the progress bar
-      // //     // $("#progress-bar").hide(1000);
-      // //   }
-      // // };
-      // xhr.send(JSON.stringify(data));
-
-      // })
-      // document.getElementById("my-form").submit();
-
       document.getElementById("lat_lon").innerHTML = `The Selected values range is <br>Latitude = (${lat_min}, ${lat_max})<br>Longitude = (${lng_min}, ${lng_max})`
     }
   } catch (error) { }
 }
-
-
-
-
-// function handleOnChange(e){
-//   console.log(e.target.value)
-// }
-
-// map.on('layeradd', function(e) {
-//   var layer = e.layer;
-//   // Perform actions on the newly added polygon layer
-//   // let coordinates = layer.getLatLngs();
-//   // console.log(coordinates)
-//   console.log('New polygetLatLngs());gon layer added:',layer.
-// })
 var count = 0
 // when a rectangle is drawn, add it to the drawnItems feature group
 map.on('draw:created', function (e) {
@@ -546,57 +310,4 @@ map.on('draw:created', function (e) {
   }
   console.log(data)
   send_req(layer.options.color, data);
-  // $(document).ready(function (){
-
-
-  // })
-  // document.getElementById("my-form").submit();
-
-  // document.getElementById("lat_lon").innerHTML = `The Selected values range is <br>Latitude = (${lat_min}, ${lat_max})<br>Longitude = (${lng_min}, ${lng_max})`
 });
-
-
-
-
-
-
-// var drawnItems = new L.FeatureGroup();
-// map.addLayer(drawnItems);
-
-// var drawControl = new L.Control.Draw({
-//     draw: {
-//         rectangle: true,
-//         marker: false,
-//         circle: false,
-//         polygon: false,
-//         polyline: false
-//     },
-//     edit: {
-//         featureGroup: drawnItems
-//     }
-// });
-// map.addControl(drawControl);
-
-// map.on('draw:created', function (e) {
-//     drawnItems.addLayer(e.layer);
-// });
-
-// import Map from 'ol/Map.js';
-// import View from 'ol/View.js';
-// import OSM from 'ol/source/OSM.js';
-// import TileLayer from 'ol/layer/Tile.js';
-
-// new Map({
-//   layers: [
-//     new TileLayer({source: new OSM()}),
-//   ],
-//   view: new View({
-//     center: [0, 0],
-//     zoom: 2,
-//   }),
-//   target: 'map',
-// });
-
-
-// let fd = document.getElementsByName("fromdate");
-

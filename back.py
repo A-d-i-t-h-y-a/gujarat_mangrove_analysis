@@ -111,26 +111,4 @@ def my_flask_function():
         return jsonify({'image': img_base64, 'labels': labels, 'data': data, 'area': area_name})
     # Calculate the components that make up the NDVI calculation
 
-# @app.route('/update-graph', methods=['POST'])
-# def update_graph():
-#     # Process the request and fetch updated data
-#     # Generate the updated graph using the new data
-#     # Save the updated graph as an image file (similar to the previous example)
-#     x = [1, 2, 3, 4, 5]
-#     y = [10, 20, 30, 25, 35]
-#     plt.plot(x, y)
-#     plt.xlabel('X-axis')
-#     plt.ylabel('Y-axis')
-
-#     # Save the graph as an image file
-#     image = io.BytesIO()
-#     plt.savefig(image, format='png')
-#     image.seek(0)
-
-#     # Encode the image as base64 string
-#     graph_url = base64.b64encode(image.getvalue()).decode()
-
-#     # Return the URL or data of the updated graph
-#     return jsonify(graph_url=graph_url)
-
 app.run(debug=True)
