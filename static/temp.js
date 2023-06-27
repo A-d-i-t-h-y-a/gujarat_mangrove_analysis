@@ -18,9 +18,13 @@ function performTask(lab) {
     const ctx = document.getElementById('chartCanvas');
     let mgr = document.getElementById('mgr');
     let head = document.getElementById('thead');
+    let tcont = document.getElementById('tcont');
+    const m = document.getElementById('map');
+    m.style.width = "50%"
     var newRow = document.createElement('tr');
 
     // Create the HTML content for the new row
+    tcont.style.display = 'block'
     var rowContent = `<th scope="row">#</th>`;
     for (i of lab) {
       rowContent += `<th>${i}</th>`;
@@ -30,7 +34,7 @@ function performTask(lab) {
 
     // Set the HTML content of the new row
     newRow.innerHTML = rowContent;
-    mgr.style.display = "block"
+    mgr.style.display = "block";
     map.invalidateSize();
 
     const chartOptions = {
@@ -125,6 +129,31 @@ function getContrastColor(color) {
   return brightness >= 128 ? "black" : "white";
 }
 
+// Get the element to append the content to
+let element = document.getElementById("imgcont");
+let d;
+
+// Function to append HTML content to the element
+function appendContent(newContent) {
+  // Generate some new HTML content
+  // Append the new content to the element without overwriting the existing content
+  element.insertAdjacentHTML("beforeend", newContent);
+
+  const imgElement = document.querySelector(`#openModalBtn${count} img`);
+  const maximizeIcon = document.querySelector(`#openModalBtn${count} .maximize-icon`);
+
+  // Add event listener to the img element
+  imgElement.addEventListener('mouseenter', () => {
+    maximizeIcon.style.opacity = "1";
+  });
+
+  imgElement.addEventListener('mouseleave', () => {
+    // maximizeIcon.style.display = "none";
+    maximizeIcon.style.opacity = "0";
+  });
+}
+
+
 function send_req(col, send_data) {
   const xhr = new XMLHttpRequest();
   xhr.open("POST", "/my_flask_route", true);
@@ -142,41 +171,22 @@ function send_req(col, send_data) {
         if (xhr.response.error) {
           console.log(xhr.response.error);
           document.getElementById("loader").classList.add("d-none");
-          const div = document.createElement('div');
-          const span = document.createElement('span');
-          let text = document.createElement('p');
-          div.style.width = "48%";
-          text.innerHTML = xhr.response.error;
-          text.style.cssText = "width: 100%; height: 80%; border: 2px solid " + col + "; margin: 2rem 0rem; display: block; border-radius: 10px;";
-          span.classList.add("badge", "text-bg-danger");
-          span.innerHTML = `${send_data['index']}`;
-          span.style.float = "right";
-          span.style.margin = "1.2rem 0rem";
-          div.appendChild(span);
-          div.appendChild(text);
-          document.getElementById("imgcont").appendChild(div)
+          count++;
+          let newContent = `<div id="openModalBtn${count}" class="fade-out" style="width: 48%;">
+    <span class="badge text-bg-danger" style="float: right; margin: 1.2rem 0rem;">No Data</span>
+    <div style="position: relative;">
+    <span class="maximize-icon">No Data Found</span>
+    </div>
+  </div>`;
+          appendContent(newContent);
         }
         else {
-          document.getElementById("loader").classList.add("d-none")
-          // const maindiv = document.getElementById("mgr");
-          const div = document.createElement('div');
-          const span = document.createElement('span');
-          const maxim = document.createElement('span');
-          const img = document.createElement('img');
-          const m = document.getElementById('map');
-          // const h = document.getElementsByClassName('heading')[0];
-          // h.classList.remove()
-          // maindiv.classList.add("row")
-          // m.classList.add("col")
-          // maxim.innerHTML = "&#x25A1;";
-          // maxim.classList.add("maximize-icon")
-          // div.appendChild(maxim)
-          m.style.width = "50%"
+          count++;
+          document.getElementById("loader").classList.add("d-none");
           let tableBody = document.getElementById('tbody');
           let newRow = document.createElement('tr');
-          count++
           // Create the HTML content for the new row
-          let rowContent = `<th style="background-color: ${col}; color: ${getContrastColor(col)}">${count}</th>`;
+          let rowContent = `<th style="background-color: ${col}; color: ${getContrastColor(col)}">${count} Avg ${send_data['index']}</th>`;
 
           for (i of xhr.response.data) {
             rowContent += `<td>${i}</td>`
@@ -196,43 +206,34 @@ function send_req(col, send_data) {
             borderColor: `${col}`,
             tension: 0.1
           }, xhr.response.labels)
-          div.style.width = "48%";
-          img.src = 'data:image/png;base64,' + xhr.response.image;
-          img.style.width = "100%";
-          img.style.border = `2px solid ${col}`;
-          img.style.margin = "2rem 0rem";
-          img.style.borderRadius = "10px"
-          span.classList.add("badge", "text-bg-primary");
-          span.innerHTML = `${xhr.response.area},${send_data['index']}`;
-          span.style.float = "right";
-          span.style.margin = "1.2rem 0rem";
-          // updateGraph();
-          // div.style.margin = "0px 4px"
-          // document.getElementById('imgcont').appendChild("<span class='badge text-bg-primary'>Primary</span>")
+          let newContent = `<div id="openModalBtn${count}" class="fade-out" style="width: 48%;">
+    <span class="badge text-bg-primary" style="float: right; margin: 1.2rem 0rem;">${xhr.response.area},${send_data['index']}</span>
+    <div style="position: relative;">
+    <span class="maximize-icon"><i class="bi bi-zoom-in"></i></span>
+    <img src="data:image/png;base64,${xhr.response.image}"
+      style="width: 100%; border: 2px solid ${col}; margin: 2rem 0rem; border-radius: 10px;">
+    </div>
+  </div>`;
+          appendContent(newContent);
+          const openModalBtn = document.querySelector(`#openModalBtn${count} img`);
+          const modal = document.getElementById("modal");
+          const closeBtn = document.querySelector(".close");
+          const mimg = document.getElementById("max_img");
 
-          // Add the image element to the document body
-          // div.id = `openModalBtn${count}`;
-          // div.classList.add("fade-out")
-          div.appendChild(span);
-          div.appendChild(img);
-          document.getElementById("imgcont").appendChild(div)
-          // const openModalBtn = document.getElementById(`openModalBtn${count}`);
-          // const modal = document.getElementById("modal");
-          // const closeBtn = document.querySelector(".close");
+          openModalBtn.addEventListener("click", function (event) {
+            modal.style.display = "block";
+            mimg.src = event.target.src;
+          });
 
-          // openModalBtn.addEventListener("click", function () {
-          //   modal.style.display = "block";
-          // });
+          closeBtn.addEventListener("click", function () {
+            modal.style.display = "none";
+          });
 
-          // closeBtn.addEventListener("click", function () {
-          //   modal.style.display = "none";
-          // });
-
-          // window.addEventListener("click", function (event) {
-          //   if (event.target == modal) {
-          //     modal.style.display = "none";
-          //   }
-          // });
+          window.addEventListener("click", function (event) {
+            if (event.target == modal) {
+              modal.style.display = "none";
+            }
+          });
         }
       }
     }
