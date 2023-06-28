@@ -137,7 +137,7 @@ let d;
 function appendContent(newContent) {
   // Generate some new HTML content
   // Append the new content to the element without overwriting the existing content
-  element.insertAdjacentHTML("beforeend", newContent);
+  element.insertAdjacentHTML("afterbegin", newContent);
 
   const imgElement = document.querySelector(`#openModalBtn${count} img`);
   const maximizeIcon = document.querySelector(`#openModalBtn${count} .maximize-icon`);
@@ -155,90 +155,87 @@ function appendContent(newContent) {
 
 
 function send_req(col, send_data) {
-  const xhr = new XMLHttpRequest();
-  xhr.open("POST", "/my_flask_route", true);
-  xhr.setRequestHeader("Content-Type", "application/json");
-  xhr.responseType = "json";
   document.getElementById("loader").classList.remove("d-none");
-  // document.getElementById("loader").scrollIntoView({ behavior: "smooth", block: "end" });
   window.scrollTo(0, document.body.scrollHeight);
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState === XMLHttpRequest.UNSENT) {
-      console.log("In Progress");
-    } else if (xhr.readyState === XMLHttpRequest.DONE) {
-      if (xhr.status === 200) {
-        // Process the response here
-        if (xhr.response.error) {
-          console.log(xhr.response.error);
-          document.getElementById("loader").classList.add("d-none");
-          count++;
-          let newContent = `<div id="openModalBtn${count}" class="fade-out" style="width: 48%;">
+  fetch('/my_flask_route', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(send_data)
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        console.log(data.error);
+        document.getElementById("loader").classList.add("d-none");
+        count++;
+        let newContent = `<div id="openModalBtn${count}" class="fade-out" style="width: 48%;">
     <span class="badge text-bg-danger" style="float: right; margin: 1.2rem 0rem;">No Data</span>
     <div style="position: relative;">
     <span class="maximize-icon">No Data Found</span>
     </div>
   </div>`;
-          appendContent(newContent);
+        appendContent(newContent);
+      }
+      else {
+        count++;
+        document.getElementById("loader").classList.add("d-none");
+        let tableBody = document.getElementById('tbody');
+        let newRow = document.createElement('tr');
+        // Create the HTML content for the new row
+        let rowContent = `<th style="background-color: ${col}; color: ${getContrastColor(col)}">${count} Avg ${send_data['index']}</th>`;
+
+        for (i of data.data) {
+          rowContent += `<td>${i}</td>`
         }
-        else {
-          count++;
-          document.getElementById("loader").classList.add("d-none");
-          let tableBody = document.getElementById('tbody');
-          let newRow = document.createElement('tr');
-          // Create the HTML content for the new row
-          let rowContent = `<th style="background-color: ${col}; color: ${getContrastColor(col)}">${count} Avg ${send_data['index']}</th>`;
 
-          for (i of xhr.response.data) {
-            rowContent += `<td>${i}</td>`
-          }
+        // Set the HTML content of the new row
+        newRow.innerHTML = rowContent;
 
-          // Set the HTML content of the new row
-          newRow.innerHTML = rowContent;
+        performTask(data.labels);
 
-          performTask(xhr.response.labels);
-
-          // Append the new row to the table body
-          tableBody.appendChild(newRow);
-          appendData({
-            label: `${xhr.response.area}`,
-            data: xhr.response.data,
-            fill: false,
-            borderColor: `${col}`,
-            tension: 0.1
-          }, xhr.response.labels)
-          let newContent = `<div id="openModalBtn${count}" class="fade-out" style="width: 48%;">
-    <span class="badge text-bg-primary" style="float: right; margin: 1.2rem 0rem;">${xhr.response.area},${send_data['index']}</span>
+        // Append the new row to the table body
+        tableBody.appendChild(newRow);
+        appendData({
+          label: `${data.area}`,
+          data: data.data,
+          fill: false,
+          borderColor: `${col}`,
+          tension: 0.1
+        }, data.labels)
+        let newContent = `<div id="openModalBtn${count}" class="fade-out" style="width: 48%;">
+    <span class="badge text-bg-primary" style="float: right; margin: 1.2rem 0rem;">${data.area},${send_data['index']}</span>
     <div style="position: relative;">
     <span class="maximize-icon"><i class="bi bi-zoom-in"></i></span>
-    <img src="data:image/png;base64,${xhr.response.image}"
+    <img src="data:image/png;base64,${data.image}"
       style="width: 100%; border: 2px solid ${col}; margin: 2rem 0rem; border-radius: 10px;">
     </div>
   </div>`;
-          appendContent(newContent);
-          const openModalBtn = document.querySelector(`#openModalBtn${count} img`);
-          const modal = document.getElementById("modal");
-          const closeBtn = document.querySelector(".close");
-          const mimg = document.getElementById("max_img");
+        appendContent(newContent);
+        const openModalBtn = document.querySelector(`#openModalBtn${count} img`);
+        const modal = document.getElementById("modal");
+        const closeBtn = document.querySelector(".close");
+        const mimg = document.getElementById("max_img");
 
-          openModalBtn.addEventListener("click", function (event) {
-            modal.style.display = "block";
-            mimg.src = event.target.src;
-          });
+        openModalBtn.addEventListener("click", function (event) {
+          modal.style.display = "block";
+          mimg.src = event.target.src;
+        });
 
-          closeBtn.addEventListener("click", function () {
+        closeBtn.addEventListener("click", function () {
+          modal.style.display = "none";
+        });
+
+        window.addEventListener("click", function (event) {
+          if (event.target == modal) {
             modal.style.display = "none";
-          });
-
-          window.addEventListener("click", function (event) {
-            if (event.target == modal) {
-              modal.style.display = "none";
-            }
-          });
-        }
+          }
+        });
       }
-    }
-  };
-  xhr.send(JSON.stringify(send_data));
+    }).catch(error => {
+      console.log('An error occurred:', error);
+    });
 }
 
 
@@ -276,7 +273,7 @@ function OnChange() {
       }
       console.log(data)
       send_req(col, data)
-      document.getElementById("lat_lon").innerHTML = `The Selected values range is <br>Latitude = (${lat_min}, ${lat_max})<br>Longitude = (${lng_min}, ${lng_max})`
+      // document.getElementById("lat_lon").innerHTML = `The Selected values range is <br>Latitude = (${lat_min}, ${lat_max})<br>Longitude = (${lng_min}, ${lng_max})`
     }
   } catch (error) { }
 }
