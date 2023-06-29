@@ -9,9 +9,10 @@ let chart, data, labels;
 let map = L.map('map').setView([15.805, 80.9], 10);
 
 let taskExecuted = false;
+let a = ""
+let z = 1;
 
-
-function performTask(lab) {
+function performTask(lab, ind) {
   if (!taskExecuted) {
     // Task logic goes here
     labels = lab;
@@ -20,20 +21,35 @@ function performTask(lab) {
     let head = document.getElementById('thead');
     let tcont = document.getElementById('tcont');
     const m = document.getElementById('map');
-    m.style.width = "50%"
-    var newRow = document.createElement('tr');
+    m.style.width = "75%"
+    ch = Chart.instances[0];
+    // z++;
+    // Check if a chart instance exists
+    if (ch) {
+      // Destroy the existing chart
+      // ch.destroy();
+      chart.data = {
+        labels: labels,
+        datasets: []
+      };
+      chart.options.plugins.title.text = (ind == "Mangrove Analysis") ? "Mangrove Area Change" : ind;
+      chart.update();
+      taskExecuted = true;
+      return;
+    }
+    // var newRow = document.createElement('tr');
 
     // Create the HTML content for the new row
     tcont.style.display = 'block'
-    var rowContent = `<th scope="row">#</th>`;
+    var rowContent = `<th scope="row">#</th>` + `<th>Area Name</th>`;
     for (i of lab) {
       rowContent += `<th>${i}</th>`;
     }
-    newRow.innerHTML = rowContent;
-    head.appendChild(newRow)
-
+    // newRow.innerHTML = rowContent;
+    // head.appendChild(newRow)
+    head.innerHTML = `<tr>${rowContent}</tr>`;
     // Set the HTML content of the new row
-    newRow.innerHTML = rowContent;
+    // newRow.innerHTML = rowContent;
     mgr.style.display = "block";
     map.invalidateSize();
 
@@ -46,6 +62,12 @@ function performTask(lab) {
       scales: {
         x: {
           display: true
+        }
+      },
+      plugins: {
+        title: {
+          display: true,
+          text: (ind == "Mangrove Analysis") ? "Mangrove Area Change" : ind
         }
       }
     };
@@ -139,18 +161,39 @@ function appendContent(newContent) {
   // Append the new content to the element without overwriting the existing content
   element.insertAdjacentHTML("afterbegin", newContent);
 
-  const imgElement = document.querySelector(`#openModalBtn${count} img`);
-  const maximizeIcon = document.querySelector(`#openModalBtn${count} .maximize-icon`);
+  try{
+    const imgElement = document.querySelector(`#openModalBtn${count} img`);
+    const maximizeIcon = document.querySelector(`#openModalBtn${count} .maximize-icon`);
+  
+    // Add event listener to the img element
+    imgElement.addEventListener('mouseenter', () => {
+      maximizeIcon.style.opacity = "1";
+    });
+  
+    imgElement.addEventListener('mouseleave', () => {
+      // maximizeIcon.style.display = "none";
+      maximizeIcon.style.opacity = "0";
+    });
+    const openModalBtn = document.querySelector(`#openModalBtn${count} img`);
+    const modal = document.getElementById("modal");
+    const closeBtn = document.querySelector(".close");
+    const mimg = document.getElementById("max_img");
 
-  // Add event listener to the img element
-  imgElement.addEventListener('mouseenter', () => {
-    maximizeIcon.style.opacity = "1";
-  });
+    openModalBtn.addEventListener("click", function (event) {
+      modal.style.display = "block";
+      mimg.src = event.target.src;
+    });
 
-  imgElement.addEventListener('mouseleave', () => {
-    // maximizeIcon.style.display = "none";
-    maximizeIcon.style.opacity = "0";
-  });
+    closeBtn.addEventListener("click", function () {
+      modal.style.display = "none";
+    });
+
+    window.addEventListener("click", function (event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    });
+  }catch(error){console.log("No Data Found")}
 }
 
 
@@ -164,36 +207,50 @@ function send_req(col, send_data) {
     },
     body: JSON.stringify(send_data)
   })
-    .then(response => response.json())
-    .then(data => {
-      if (data.error) {
-        console.log(data.error);
-        document.getElementById("loader").classList.add("d-none");
-        count++;
-        let newContent = `<div id="openModalBtn${count}" class="fade-out" style="width: 48%;">
-    <span class="badge text-bg-danger" style="float: right; margin: 1.2rem 0rem;">No Data</span>
-    <div style="position: relative;">
-    <span class="maximize-icon">No Data Found</span>
-    </div>
-  </div>`;
-        appendContent(newContent);
-      }
-      else {
-        count++;
-        document.getElementById("loader").classList.add("d-none");
-        let tableBody = document.getElementById('tbody');
-        let newRow = document.createElement('tr');
+  .then(response => response.json())
+  .then(data => {
+    if (data.error) {
+      // console.log(data.error);
+      document.getElementById("loader").classList.add("d-none");
+        // count++;
+      //   let newContent = `<div class="alert alert-danger d-flex align-items-center" role="alert">
+      //   <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+      //   <div>
+      //     No Data Found
+      //   </div>
+      // </div>`;
+      // appendContent(newContent);
+      document.getElementsByClassName("alert")[0].style.display = "block"
+      setTimeout(() => {
+        document.getElementsByClassName("alert")[0].style.opacity = "1"
+      }, 10);
+      setTimeout(() => {
+        document.getElementsByClassName("alert")[0].style.opacity = "0"
+      }, 3500);
+      setTimeout(() => {
+        document.getElementsByClassName("alert")[0].style.display = "none"
+      }, 7000);
+    }
+    else {
+      count++;
+      document.getElementById("loader").classList.add("d-none");
+      let tableBody = document.getElementById('tbody');
+      let newRow = document.createElement('tr');
         // Create the HTML content for the new row
-        let rowContent = `<th style="background-color: ${col}; color: ${getContrastColor(col)}">${count} Avg ${send_data['index']}</th>`;
+        let rowContent = `<th style="background-color: ${col}; color: ${getContrastColor(col)}">${z++} ${(send_data['index'] != "Mangrove Analysis") ? "Avg" + send_data['index'] : "Mangrove Area"}</th><td>${(data.area != "") ? data.area : "Area Not Identified"}</td>`;
 
         for (i of data.data) {
-          rowContent += `<td>${i}</td>`
+          rowContent += `<td>${(send_data['index'] == "Mangrove Analysis") ? i + " sq.km" : i}</td>`
         }
 
+        if (send_data['index'] != a) {
+          a = send_data['index']
+          taskExecuted = false
+        }
         // Set the HTML content of the new row
         newRow.innerHTML = rowContent;
 
-        performTask(data.labels);
+        performTask(data.labels, send_data['index']);
 
         // Append the new row to the table body
         tableBody.appendChild(newRow);
@@ -213,25 +270,18 @@ function send_req(col, send_data) {
     </div>
   </div>`;
         appendContent(newContent);
-        const openModalBtn = document.querySelector(`#openModalBtn${count} img`);
-        const modal = document.getElementById("modal");
-        const closeBtn = document.querySelector(".close");
-        const mimg = document.getElementById("max_img");
-
-        openModalBtn.addEventListener("click", function (event) {
-          modal.style.display = "block";
-          mimg.src = event.target.src;
-        });
-
-        closeBtn.addEventListener("click", function () {
-          modal.style.display = "none";
-        });
-
-        window.addEventListener("click", function (event) {
-          if (event.target == modal) {
-            modal.style.display = "none";
-          }
-        });
+        if(send_data['index'] == "Mangrove Analysis"){
+          count++;
+          newContent = `<div id="openModalBtn${count}" class="fade-out" style="width: 48%;">
+          <span class="badge text-bg-primary" style="float: right; margin: 1.2rem 0rem;">${data.area},${send_data['index']}</span>
+          <div style="position: relative;">
+          <span class="maximize-icon"><i class="bi bi-zoom-in"></i></span>
+          <img src="data:image/png;base64,${data.chman}" class="h-100"
+          style="width: 100%; border: 2px solid ${col}; margin: 2rem 0rem; border-radius: 10px;">
+          </div>
+          </div>`;
+          appendContent(newContent);
+        }
       }
     }).catch(error => {
       console.log('An error occurred:', error);

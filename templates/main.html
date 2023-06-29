@@ -102,7 +102,7 @@
       cursor: pointer;
     }
 
-    [id^="openModalBtn"] img{
+    [id^="openModalBtn"] img {
       cursor: pointer;
       filter: brightness(1);
       transition: filter 0.5s;
@@ -112,7 +112,12 @@
       filter: brightness(0.7);
     }
 
-    
+    th,
+    td {
+      width: 40px;
+      text-align: center;
+    }
+
     .maximize-icon {
       opacity: 0;
       position: absolute;
@@ -127,11 +132,6 @@
       pointer-events: none;
     }
 
-    .heading {
-      display: inline-block;
-      margin: 0px auto;
-    }
-    
     #thead {
       position: sticky;
       top: 0;
@@ -146,6 +146,24 @@
       /* Set the desired maximum height for the tbody */
       overflow-y: auto;
       /* Enable vertical scroll when content exceeds the max-height */
+    }
+
+    #alert {
+      position: fixed;
+      width: 100%;
+      z-index: 1001;
+      display: flex;
+      justify-content: center;
+    }
+    
+    .alert{
+      display: none;
+      opacity: 0;
+      transition: opacity 1s;
+      margin-top: 1.5rem;
+      position: absolute;
+      text-align: center;
+      width: 80%;
     }
   </style>
 
@@ -167,6 +185,11 @@
     </div>
   </div>
   <header>
+    <div id="alert">
+      <div class="alert alert-danger" role="alert">
+        No Data Available at the Area you selected. Kindly Select other Area
+      </div>
+    </div>
     <div style="display: flex; justify-content: center; padding: 10px 0px; background-color: aquamarine;">
       <h2>Gujarat Mangrove Analysis</h2>
     </div>
@@ -184,8 +207,9 @@
       <div class="row input-group my-4 mx-0">
         <span class="col-lg-1 input-group-text">Calculation</span>
         <select class="form-select col-lg-5 " id="calc" name="calc" onchange="OnChange()">
-          <option selected">NDVI</option>
+          <option>NDVI</option>
           <option>NDWI</option>
+          <option selected>Mangrove Analysis</option>
         </select>
       </div>
     </div>
@@ -197,8 +221,8 @@
       <span class="col-lg-1 input-group-text">Buffer</span>
       <input type="text" class="form-control" id="buffer" aria-labelledby="buffer" onchange="OnChange()">
     </div>
-    <div>
-      <h2 class="heading text">Map</h2>
+    <div id="heading" class="row">
+      <h2 class="heading text col">Map</h2>
     </div>
     <!-- <div class="row">
       <div id="map" class="rounded"></div>
@@ -207,13 +231,14 @@
       </div>
     </div> -->
     <div style="display: flex; flex-direction: row;">
-      <div id="map" class="rounded"></div>
+      <div id="map" class="rounded"><i class="fa-solid fa-location-crosshairs"></i></div>
       <div id="mgr" class="ms-5" style="width: 50%; display: none;">
         <canvas id="chartCanvas" class="w-100" style="height: 100%;"></canvas>
       </div>
     </div>
     <!-- <div > -->
     <!-- <div class="d-flex" style="width: 50%; height: 100%;"> -->
+    <!-- <h3 class="tabhead mt-5 mb-2 d-none" style="text-align: center;">Mangrove Extent Change</h3> -->
     <div id="tcont" class="overflow-y my-5" style="display: none;">
       <table class="table">
         <thead id="thead">
