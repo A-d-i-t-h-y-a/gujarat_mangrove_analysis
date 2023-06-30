@@ -12,6 +12,10 @@ let taskExecuted = false;
 let a = ""
 let z = 1;
 
+function relocate(){
+  map.flyTo([15.805, 80.9], 10);
+}
+
 function performTask(lab, ind) {
   if (!taskExecuted) {
     // Task logic goes here
@@ -33,6 +37,7 @@ function performTask(lab, ind) {
         datasets: []
       };
       chart.options.plugins.title.text = (ind == "Mangrove Analysis") ? "Mangrove Area Change" : ind;
+      chart.options.scales.y.title.text = (ind != "Mangrove Analysis") ? "Avg "+ind :"Mangrove Area";
       chart.update();
       taskExecuted = true;
       return;
@@ -41,7 +46,7 @@ function performTask(lab, ind) {
 
     // Create the HTML content for the new row
     tcont.style.display = 'block'
-    var rowContent = `<th scope="row">#</th>` + `<th>Area Name</th>`;
+    var rowContent = `<th scope="row">Analysis</th>` + `<th>Area Name</th>`;
     for (i of lab) {
       rowContent += `<th>${i}</th>`;
     }
@@ -61,8 +66,18 @@ function performTask(lab, ind) {
       },
       scales: {
         x: {
-          display: true
+          title: {
+            display: true,
+            text:"Date"
+          }
+        },
+        y: {
+          title: {
+            display: true,
+            text:(ind != "Mangrove Analysis") ? "Avg "+ind :"Mangrove Area"
+          }
         }
+
       },
       plugins: {
         title: {
@@ -276,8 +291,8 @@ function send_req(col, send_data) {
           <span class="badge text-bg-primary" style="float: right; margin: 1.2rem 0rem;">${data.area},${send_data['index']}</span>
           <div style="position: relative;">
           <span class="maximize-icon"><i class="bi bi-zoom-in"></i></span>
-          <img src="data:image/png;base64,${data.chman}" class="h-100"
-          style="width: 100%; border: 2px solid ${col}; margin: 2rem 0rem; border-radius: 10px;">
+          <img src="data:image/png;base64,${data.chman}"
+          style="width: 100%; height: 16.8rem; border: 2px solid ${col}; margin: 2rem 0rem; border-radius: 10px;">
           </div>
           </div>`;
           appendContent(newContent);
