@@ -1,18 +1,17 @@
-let fd = document.getElementsByName("fromdate")[0];
-let td = document.getElementsByName("todate")[0];
-let today = new Date().toISOString().split("T")[0];
-td.max = today;
-fd.max = today;
+window.addEventListener("scroll", function () {
+  var scrollToTopBtn = document.getElementById("scrollToTopBtn");
+  if (document.documentElement.scrollTop > 1000) {
+    scrollToTopBtn.style.display = "block";
+  } else {
+    scrollToTopBtn.style.display = "none";
+  }
+});
 
-let chart, data, labels;
+document.getElementById("scrollToTopBtn").addEventListener("click", function () {
+  document.documentElement.scrollTop = 0; // Scroll to the top of the page
+});
 
-let map = L.map('map').setView([15.805, 80.9], 10);
-
-let taskExecuted = false;
-let a = ""
-let z = 1;
-
-function relocate(){
+function relocate() {
   map.flyTo([15.805, 80.9], 10);
 }
 
@@ -37,7 +36,7 @@ function performTask(lab, ind) {
         datasets: []
       };
       chart.options.plugins.title.text = (ind == "Mangrove Analysis") ? "Mangrove Area Change" : ind;
-      chart.options.scales.y.title.text = (ind != "Mangrove Analysis") ? "Avg "+ind :"Mangrove Area";
+      chart.options.scales.y.title.text = (ind != "Mangrove Analysis") ? "Avg " + ind : "Mangrove Area";
       chart.update();
       taskExecuted = true;
       return;
@@ -68,13 +67,13 @@ function performTask(lab, ind) {
         x: {
           title: {
             display: true,
-            text:"Date"
+            text: "Date"
           }
         },
         y: {
           title: {
             display: true,
-            text:(ind != "Mangrove Analysis") ? "Avg "+ind :"Mangrove Area"
+            text: (ind != "Mangrove Analysis") ? "Avg " + ind : "Mangrove Area"
           }
         }
 
@@ -115,36 +114,6 @@ function appendData(newData, lab) {
   chart.update();
 }
 
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 19,
-  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-}).addTo(map);
-
-let latlng = L.latLng(15.7, 80.85);
-
-let drawnItems = L.featureGroup().addTo(map);
-
-// create a Rectangle draw handler
-let drawControl = new L.Control.Draw({
-  draw: {
-    rectangle: {
-      shapeOptions: {
-        color: "black",
-        weight: 3
-      }
-    },
-    polygon: false,
-    circle: false,
-    marker: false,
-    polyline: false,
-    circlemarker: false
-  },
-  edit: {
-    featureGroup: drawnItems
-  }
-}).addTo(map);
-
-
 function getRandomColor() {
   // Generate a random color in hexadecimal format
   // Generate random RGB values in the range of 128-255 (instead of 0-128)
@@ -160,15 +129,20 @@ function getRandomColor() {
 }
 
 function getContrastColor(color) {
-  const rgb = color.match(/\d+/g);
-  const brightness = (parseInt(rgb[0]) * 299 + parseInt(rgb[1]) * 587 + parseInt(rgb[2]) * 114) / 1000;
+  console.log(color)
+  const rgba = color.match(/[\d.]+/g);
+  const alpha = parseFloat(rgba[3]);
+
+  if (alpha < 1) {
+    // If the color is transparent, you can choose a contrasting color based on your preference
+    // For example, you can return "black" for transparent colors
+    return "black";
+  }
+
+  const brightness = (parseFloat(rgba[0]) * 299 + parseFloat(rgba[1]) * 587 + parseFloat(rgba[2]) * 114) / 1000;
 
   return brightness >= 128 ? "black" : "white";
 }
-
-// Get the element to append the content to
-let element = document.getElementById("imgcont");
-let d;
 
 // Function to append HTML content to the element
 function appendContent(newContent) {
@@ -176,15 +150,15 @@ function appendContent(newContent) {
   // Append the new content to the element without overwriting the existing content
   element.insertAdjacentHTML("afterbegin", newContent);
 
-  try{
+  try {
     const imgElement = document.querySelector(`#openModalBtn${count} img`);
     const maximizeIcon = document.querySelector(`#openModalBtn${count} .maximize-icon`);
-  
+
     // Add event listener to the img element
     imgElement.addEventListener('mouseenter', () => {
       maximizeIcon.style.opacity = "1";
     });
-  
+
     imgElement.addEventListener('mouseleave', () => {
       // maximizeIcon.style.display = "none";
       maximizeIcon.style.opacity = "0";
@@ -208,13 +182,28 @@ function appendContent(newContent) {
         modal.style.display = "none";
       }
     });
-  }catch(error){console.log("No Data Found")}
+  } catch (error) { console.log("No Data Found") }
 }
 
+function displayalert(msg) {
+  document.getElementsByClassName("alert")[0].style.display = "block"
+  document.getElementsByClassName("alert")[0].innerHTML = msg
+  setTimeout(() => {
+    document.getElementsByClassName("alert")[0].style.opacity = "1"
+  }, 10);
+  setTimeout(() => {
+    document.getElementsByClassName("alert")[0].style.opacity = "0"
+  }, 3500);
+  setTimeout(() => {
+    document.getElementsByClassName("alert")[0].style.display = "none"
+  }, 7000);
+}
 
-function send_req(col, send_data) {
+var targetElement = document.getElementById("loader");
+
+function send_req(col, send_data, drawnRectangle) {
   document.getElementById("loader").classList.remove("d-none");
-  window.scrollTo(0, document.body.scrollHeight);
+  targetElement.scrollIntoView({ behavior: "smooth" });
   fetch('/my_flask_route', {
     method: 'POST',
     headers: {
@@ -222,37 +211,20 @@ function send_req(col, send_data) {
     },
     body: JSON.stringify(send_data)
   })
-  .then(response => response.json())
-  .then(data => {
-    if (data.error) {
-      // console.log(data.error);
-      document.getElementById("loader").classList.add("d-none");
-        // count++;
-      //   let newContent = `<div class="alert alert-danger d-flex align-items-center" role="alert">
-      //   <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
-      //   <div>
-      //     No Data Found
-      //   </div>
-      // </div>`;
-      // appendContent(newContent);
-      document.getElementsByClassName("alert")[0].style.display = "block"
-      setTimeout(() => {
-        document.getElementsByClassName("alert")[0].style.opacity = "1"
-      }, 10);
-      setTimeout(() => {
-        document.getElementsByClassName("alert")[0].style.opacity = "0"
-      }, 3500);
-      setTimeout(() => {
-        document.getElementsByClassName("alert")[0].style.display = "none"
-      }, 7000);
-    }
-    else {
-      count++;
-      document.getElementById("loader").classList.add("d-none");
-      let tableBody = document.getElementById('tbody');
-      let newRow = document.createElement('tr');
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        document.getElementById("loader").classList.add("d-none");
+        displayalert("No Data Available at the Area you selected. Kindly Select other Area")
+      }
+      else {
+        count++;
+        targetElement = document.getElementById("tcont");
+        document.getElementById("loader").classList.add("d-none");
+        let tableBody = document.getElementById('tbody');
+        let newRow = document.createElement('tr');
         // Create the HTML content for the new row
-        let rowContent = `<th style="background-color: ${col}; color: ${getContrastColor(col)}">${z++} ${(send_data['index'] != "Mangrove Analysis") ? "Avg" + send_data['index'] : "Mangrove Area"}</th><td>${(data.area != "") ? data.area : "Area Not Identified"}</td>`;
+        let rowContent = `<th id="scrollBtn${count}" style="background-color: ${col}; color: ${getContrastColor(col)}">${z++} ${(send_data['index'] != "Mangrove Analysis") ? "Avg" + send_data['index'] : "Mangrove Area"}</th><td>${(data.area != "") ? data.area : "Area Not Identified"}</td>`;
 
         for (i of data.data) {
           rowContent += `<td>${(send_data['index'] == "Mangrove Analysis") ? i + " sq.km" : i}</td>`
@@ -276,33 +248,38 @@ function send_req(col, send_data) {
           borderColor: `${col}`,
           tension: 0.1
         }, data.labels)
-        let newContent = `<div id="openModalBtn${count}" class="fade-out" style="width: 48%;">
-    <span class="badge text-bg-primary" style="float: right; margin: 1.2rem 0rem;">${data.area},${send_data['index']}</span>
-    <div style="position: relative;">
-    <span class="maximize-icon"><i class="bi bi-zoom-in"></i></span>
-    <img src="data:image/png;base64,${data.image}"
-      style="width: 100%; border: 2px solid ${col}; margin: 2rem 0rem; border-radius: 10px;">
-    </div>
-  </div>`;
+        let newContent = `<div id="openModalBtn${count}" class="fade-out" style="${(send_data['index'] == "Mangrove Analysis") ? "" : "width:48%"}">
+        <span class="badge text-bg-primary" style="float: right; margin: 1.2rem 0rem;">${data.area},${send_data['index']}</span>
+        <div style="position: relative;">
+        <span class="maximize-icon"><i class="bi bi-zoom-in"></i></span>
+        <img src="data:image/png;base64,${data.image}"
+        style="width: 100%; border: 2px solid ${col}; margin: 2rem 0rem; border-radius: 10px;">
+        </div>
+        </div>`;
         appendContent(newContent);
-        if(send_data['index'] == "Mangrove Analysis"){
-          count++;
-          newContent = `<div id="openModalBtn${count}" class="fade-out" style="width: 48%;">
-          <span class="badge text-bg-primary" style="float: right; margin: 1.2rem 0rem;">${data.area},${send_data['index']}</span>
-          <div style="position: relative;">
-          <span class="maximize-icon"><i class="bi bi-zoom-in"></i></span>
-          <img src="data:image/png;base64,${data.chman}"
-          style="width: 100%; height: 16.8rem; border: 2px solid ${col}; margin: 2rem 0rem; border-radius: 10px;">
-          </div>
-          </div>`;
-          appendContent(newContent);
-        }
+        document.getElementById(`scrollBtn${count}`).addEventListener("click", function () {
+          var targetElement = document.getElementById(`openModalBtn${count}`);
+          targetElement.scrollIntoView({ behavior: "smooth" });
+        });
+        // if (send_data['index'] == "Mangrove Analysis") {
+        //   count++;
+        //   newContent = `<div id="openModalBtn${count}" class="fade-out" style="width: 48%;">
+        //   <span class="badge text-bg-primary" style="float: right; margin: 1.2rem 0rem;">${data.area},${send_data['index']}</span>
+        //   <div style="position: relative;">
+        //   <span class="maximize-icon"><i class="bi bi-zoom-in"></i></span>
+        //   <img src="data:image/png;base64,${data.chman}"
+        //   style="width: 100%; height: 16.8rem; border: 2px solid ${col}; margin: 2rem 0rem; border-radius: 10px;">
+        //   </div>
+        //   </div>`;
+        //   appendContent(newContent);
+        // }
       }
     }).catch(error => {
+      document.getElementById("loader").classList.add("d-none");
+      displayalert("An Error Occured While Fetching Data")
       console.log('An error occurred:', error);
     });
 }
-
 
 function OnChange() {
   try {
@@ -337,12 +314,62 @@ function OnChange() {
         index: index
       }
       console.log(data)
-      send_req(col, data)
+      send_req(col, data, polygonCoordinates)
       // document.getElementById("lat_lon").innerHTML = `The Selected values range is <br>Latitude = (${lat_min}, ${lat_max})<br>Longitude = (${lng_min}, ${lng_max})`
     }
   } catch (error) { }
 }
+
+let fd = document.getElementsByName("fromdate")[0];
+let td = document.getElementsByName("todate")[0];
+let today = new Date().toISOString().split("T")[0];
+td.max = today;
+fd.max = today;
+
+let chart, data, labels;
+
+let taskExecuted = false;
+let a = ""
+let z = 1;
 var count = 0
+
+let map = L.map('map').setView([15.805, 80.9], 10);
+
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
+
+let latlng = L.latLng(15.7, 80.85);
+
+let drawnItems = L.featureGroup().addTo(map);
+
+// create a Rectangle draw handler
+let drawControl = new L.Control.Draw({
+  draw: {
+    rectangle: {
+      shapeOptions: {
+        color: "black",
+        weight: 3
+      }
+    },
+    polygon: false,
+    circle: false,
+    marker: false,
+    polyline: false,
+    circlemarker: false
+  },
+  edit: {
+    featureGroup: drawnItems
+  }
+}).addTo(map);
+
+
+
+// Get the element to append the content to
+let element = document.getElementById("imgcont");
+let d;
+
 // when a rectangle is drawn, add it to the drawnItems feature group
 map.on('draw:created', function (e) {
   var layer = e.layer;
@@ -371,6 +398,12 @@ map.on('draw:created', function (e) {
     fromdate: fromdate,
     index: index
   }
+  let polygonCoordinates = [
+    [lat_min, lng_min],
+    [lat_max, lng_min],
+    [lat_max, lng_max],
+    [lat_min, lng_max]
+  ];
   console.log(data)
-  send_req(layer.options.color, data);
+  send_req(layer.options.color, data, polygonCoordinates);
 });
