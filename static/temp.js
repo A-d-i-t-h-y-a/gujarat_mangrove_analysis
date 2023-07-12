@@ -12,7 +12,7 @@ document.getElementById("scrollToTopBtn").addEventListener("click", function () 
 });
 
 function relocate() {
-  map.flyTo([15.805, 80.9], 10);
+  map.flyTo([22.5, 69.9], 9);
 }
 
 function performTask(lab, ind) {
@@ -333,7 +333,7 @@ let a = ""
 let z = 1;
 var count = 0
 
-let map = L.map('map').setView([15.805, 80.9], 10);
+let map = L.map('map').setView([22.5, 69.9], 9);
 
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
