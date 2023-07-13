@@ -1,3 +1,31 @@
+let navitem = document.getElementsByClassName("nav-link");
+let acc = document.getElementsByClassName("accordion");
+function act(cont) {
+  for (let item of navitem) {
+    let e = document.getElementsByClassName(cont)[0];
+    if (item === e && item.classList.contains("active")) {
+      break;
+    }
+    if (item === e && !(item.classList.contains("active"))) {
+      item.classList.add("active");
+    }
+    else {
+      item.classList.remove("active");
+    }
+  }
+  for (let content of acc) {
+    if (content.id === cont && content.classList.contains("act")) {
+      break;
+    }
+    if (content.id === cont && !(content.classList.contains("act"))) {
+      content.classList.add("act");
+    }
+    else {
+      content.classList.remove("act");
+    }
+  }
+}
+
 window.addEventListener("scroll", function () {
   var scrollToTopBtn = document.getElementById("scrollToTopBtn");
   if (document.documentElement.scrollTop > 1000) {
@@ -24,6 +52,8 @@ function performTask(lab, ind) {
     let head = document.getElementById('thead');
     let tcont = document.getElementById('tcont');
     const m = document.getElementById('map');
+    let npills = document.getElementById("navpills");
+    let imagedata = document.getElementById("imagedata");
     m.style.width = "75%"
     ch = Chart.instances[0];
     // z++;
@@ -31,6 +61,14 @@ function performTask(lab, ind) {
     if (ch) {
       // Destroy the existing chart
       // ch.destroy();
+      npills.insertAdjacentHTML("beforeend", `<li class="nav-item">
+    <button class="nav-link me-2 ${ind}" aria-current="page" href="#"
+    onclick="act('${ind}')">${ind}</button>
+    </li>`);
+      imagedata.insertAdjacentHTML("beforeend", `<div class="accordion" id="${ind}">
+      <div id="imgcont${ind.replaceAll(" ","_")}" class="d-flex flex-row flex-wrap justify-content-between h-5" style="margin: 1.5rem 0rem;">
+      </div>
+    </div>`);
       chart.data = {
         labels: labels,
         datasets: []
@@ -41,6 +79,14 @@ function performTask(lab, ind) {
       taskExecuted = true;
       return;
     }
+    npills.insertAdjacentHTML("beforeend", `<li class="nav-item">
+    <button class="nav-link active me-2 ${ind}" aria-current="page" href="#"
+    onclick="act('${ind}')">${ind}</button>
+    </li>`);
+    imagedata.insertAdjacentHTML("beforeend", `<div class="accordion act" id="${ind}">
+    <div id="imgcont${ind.replaceAll(" ","_")}" class="d-flex flex-row flex-wrap justify-content-between h-5" style="margin: 1.5rem 0rem;">
+    </div>
+  </div>`);
     // var newRow = document.createElement('tr');
 
     // Create the HTML content for the new row
@@ -145,10 +191,10 @@ function getContrastColor(color) {
 }
 
 // Function to append HTML content to the element
-function appendContent(newContent) {
+function appendContent(newContent, ind) {
   // Generate some new HTML content
   // Append the new content to the element without overwriting the existing content
-  element.insertAdjacentHTML("afterbegin", newContent);
+  document.getElementById(`imgcont${ind.replaceAll(" ","_")}`).insertAdjacentHTML("afterbegin", newContent);
 
   try {
     const imgElement = document.querySelector(`#openModalBtn${count} img`);
@@ -198,6 +244,7 @@ function displayalert(msg) {
     document.getElementsByClassName("alert")[0].style.display = "none"
   }, 7000);
 }
+let klm = 0;
 
 var targetElement = document.getElementById("loader");
 
@@ -211,11 +258,33 @@ function send_req(col, send_data, drawnRectangle) {
     },
     body: JSON.stringify(send_data)
   })
-    .then(response => response.json())
+    .then(response => {
+      let a = response.json()
+      console.log("Hello", a)
+      return a;
+    })
     .then(data => {
-      if (data.error) {
+      if (data && data.error) {
         document.getElementById("loader").classList.add("d-none");
         displayalert("No Data Available at the Area you selected. Kindly Select other Area")
+      }
+      else if (data && data.plot) {
+        document.getElementById("loader").classList.add("d-none");
+        const plotData = JSON.parse(data.plot);
+        console.log(plotData)
+        randomForest.style.display = "block"
+        let newContent = `<div id="plot-container-${klm}"></div>`;
+        document.getElementById("plot-container").insertAdjacentHTML("afterbegin", newContent)
+        Plotly.newPlot(`plot-container-${klm}`, plotData);
+        klm++;
+        performTask(data.points.labels, send_data['index']);
+        appendData({
+          label: `${data.area_name}`,
+          data: data.points.actual_values,
+          fill: false,
+          borderColor: `${col}`,
+          tension: 0.1
+        }, data.points.labels)
       }
       else {
         count++;
@@ -256,7 +325,7 @@ function send_req(col, send_data, drawnRectangle) {
         style="width: 100%; border: 2px solid ${col}; margin: 2rem 0rem; border-radius: 10px;">
         </div>
         </div>`;
-        appendContent(newContent);
+        appendContent(newContent, send_data['index']);
         document.getElementById(`scrollBtn${count}`).addEventListener("click", function () {
           var targetElement = document.getElementById(`openModalBtn${count}`);
           targetElement.scrollIntoView({ behavior: "smooth" });
@@ -323,6 +392,7 @@ function OnChange() {
 let fd = document.getElementsByName("fromdate")[0];
 let td = document.getElementsByName("todate")[0];
 let today = new Date().toISOString().split("T")[0];
+let randomForest = document.getElementById('randomForest')
 td.max = today;
 fd.max = today;
 
@@ -367,7 +437,7 @@ let drawControl = new L.Control.Draw({
 
 
 // Get the element to append the content to
-let element = document.getElementById("imgcont");
+// let element = document.getElementById("imgcont");
 let d;
 
 // when a rectangle is drawn, add it to the drawnItems feature group

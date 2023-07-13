@@ -28,6 +28,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&display=swap" rel="stylesheet">
+  <script src="https://cdn.plot.ly/plotly-2.24.1.min.js" charset="utf-8"></script>
 
   <style>
     html,
@@ -35,6 +36,15 @@
       margin: 0px;
       padding: 0px;
     }
+
+    .accordion {
+      display: none;
+    }
+
+    .act {
+      display: block;
+    }
+
 
     #map {
       height: 500px;
@@ -227,6 +237,7 @@
           <option>NDVI</option>
           <option>NDWI</option>
           <option selected>Mangrove Analysis</option>
+          <option>ML Analysis</option>
         </select>
       </div>
     </div>
@@ -250,6 +261,9 @@
         <canvas id="chartCanvas" class="w-100" style="height: 100%;"></canvas>
       </div>
     </div>
+    <div id="randomForest" style="display: none;">
+      <div id="plot-container"></div>
+    </div>
     <div id="tcont" class="overflow-y my-5" style="display: none;">
       <table class="table">
         <thead id="thead">
@@ -260,11 +274,30 @@
         </tbody>
       </table>
     </div>
+    <ul id="navpills" class="nav nav-pills mt-4">
+      <!-- <li class="nav-item">
+        <button class="nav-link active me-2 Ongoing" aria-current="page" href="#"
+          onclick="act('Ongoing')">Ongoing</button>
+      </li>
+      <li class="nav-item me-2">
+        <button class="nav-link Upcoming" href="#" onclick="act('Upcoming')">Upcoming</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link Past" href="#" onclick="act('Past')">Past</button>
+      </li> -->
+    </ul>
     <div id="loader" class="spinner-border text-primary d-block mx-auto my-5 d-none" role="status">
       <span class="visually-hidden"></span>
     </div>
-    <div id="imgcont" class="d-flex flex-row flex-wrap justify-content-between h-5" style="margin: 1.5rem 0rem;">
-
+    <div id="imagedata">
+      <!-- <div class="accordion act" id="Ongoing">
+        <div id="imgcont" class="d-flex flex-row flex-wrap justify-content-between h-5" style="margin: 1.5rem 0rem;">
+        </div>
+      </div>
+      <div class="accordion" id="Upcoming">
+        <div id="imgcont" class="d-flex flex-row flex-wrap justify-content-between h-5" style="margin: 1.5rem 0rem;">
+        </div>
+      </div> -->
     </div>
   </div>
   <script src="{{ url_for('static', filename = 'temp.js') }}"></script>
