@@ -65,10 +65,17 @@ function performTask(lab, ind) {
     <button class="nav-link me-2 ${ind}" aria-current="page" href="#"
     onclick="act('${ind}')">${ind}</button>
     </li>`);
-      imagedata.insertAdjacentHTML("beforeend", `<div class="accordion" id="${ind}">
-      <div id="imgcont${ind.replaceAll(" ","_")}" class="d-flex flex-row flex-wrap justify-content-between h-5" style="margin: 1.5rem 0rem;">
+      if (ind != "ML Analysis") {
+        imagedata.insertAdjacentHTML("beforeend", `<div class="accordion" id="${ind}">
+      <div id="imgcont${ind.replaceAll(" ", "_")}" class="d-flex flex-row flex-wrap justify-content-between h-5" style="margin: 1.5rem 0rem;">
       </div>
     </div>`);
+      }
+      else {
+        imagedata.insertAdjacentHTML("beforeend", `<div class="accordion act" id="${ind}">
+        <div id="plot-container"></div>
+      </div>`);
+      }
       chart.data = {
         labels: labels,
         datasets: []
@@ -83,10 +90,17 @@ function performTask(lab, ind) {
     <button class="nav-link active me-2 ${ind}" aria-current="page" href="#"
     onclick="act('${ind}')">${ind}</button>
     </li>`);
-    imagedata.insertAdjacentHTML("beforeend", `<div class="accordion act" id="${ind}">
-    <div id="imgcont${ind.replaceAll(" ","_")}" class="d-flex flex-row flex-wrap justify-content-between h-5" style="margin: 1.5rem 0rem;">
-    </div>
-  </div>`);
+    if(ind != "ML Analysis"){
+      imagedata.insertAdjacentHTML("beforeend", `<div class="accordion act" id="${ind}">
+      <div id="imgcont${ind.replaceAll(" ", "_")}" class="d-flex flex-row flex-wrap justify-content-between h-5" style="margin: 1.5rem 0rem;">
+      </div>
+    </div>`);
+    }
+    else{
+      imagedata.insertAdjacentHTML("beforeend", `<div class="accordion act" id="${ind}">
+        <div id="plot-container"></div>
+      </div>`);
+    }
     // var newRow = document.createElement('tr');
 
     // Create the HTML content for the new row
@@ -194,7 +208,7 @@ function getContrastColor(color) {
 function appendContent(newContent, ind) {
   // Generate some new HTML content
   // Append the new content to the element without overwriting the existing content
-  document.getElementById(`imgcont${ind.replaceAll(" ","_")}`).insertAdjacentHTML("afterbegin", newContent);
+  document.getElementById(`imgcont${ind.replaceAll(" ", "_")}`).insertAdjacentHTML("afterbegin", newContent);
 
   try {
     const imgElement = document.querySelector(`#openModalBtn${count} img`);
@@ -258,11 +272,7 @@ function send_req(col, send_data, drawnRectangle) {
     },
     body: JSON.stringify(send_data)
   })
-    .then(response => {
-      let a = response.json()
-      console.log("Hello", a)
-      return a;
-    })
+    .then(response => response.json())
     .then(data => {
       if (data && data.error) {
         document.getElementById("loader").classList.add("d-none");
@@ -270,14 +280,18 @@ function send_req(col, send_data, drawnRectangle) {
       }
       else if (data && data.plot) {
         document.getElementById("loader").classList.add("d-none");
+        if (send_data['index'] != a) {
+          a = send_data['index']
+          taskExecuted = false
+        }
+        performTask(data.points.labels, send_data['index']);
         const plotData = JSON.parse(data.plot);
         console.log(plotData)
-        randomForest.style.display = "block"
+        // document.getElementById('randomForest').style.display = "block"
         let newContent = `<div id="plot-container-${klm}"></div>`;
         document.getElementById("plot-container").insertAdjacentHTML("afterbegin", newContent)
         Plotly.newPlot(`plot-container-${klm}`, plotData);
         klm++;
-        performTask(data.points.labels, send_data['index']);
         appendData({
           label: `${data.area_name}`,
           data: data.points.actual_values,
@@ -392,7 +406,7 @@ function OnChange() {
 let fd = document.getElementsByName("fromdate")[0];
 let td = document.getElementsByName("todate")[0];
 let today = new Date().toISOString().split("T")[0];
-let randomForest = document.getElementById('randomForest')
+// let randomForest = document.getElementById('randomForest')
 td.max = today;
 fd.max = today;
 
