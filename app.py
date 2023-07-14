@@ -7,6 +7,7 @@ import xarray as xr
 import pandas as pd
 from matplotlib.colors import ListedColormap
 import geopandas as gpd
+import matplotlib.colors as mcolors
 import numpy as np
 import base64
 from datacube.utils.cog import write_cog
@@ -156,6 +157,7 @@ def mang_ml_analysis(ds, times, lat_range, lon_range):
 
     print("Plot plotted")
 
+    area_name = get_area_name(np.mean(lat_range), np.mean(lon_range))
     plot_layout = go.Layout(
         title='Mangrove Cover'
     )
@@ -174,7 +176,6 @@ def mang_ml_analysis(ds, times, lat_range, lon_range):
     # Convert plot to JSON
     plot_json = pio.to_json(fig)
     print(plot_json)
-    area_name = get_area_name(np.mean(lat_range), np.mean(lon_range))
     print(area_name)
     print(data)
 
@@ -230,7 +231,7 @@ def my_flask_function():
                 "resolution": (-30, 30)
             }
         col = ""
-        mi = 0
+        mi = -1
         ma = 1
         data = []
         try:
@@ -241,12 +242,21 @@ def my_flask_function():
                 band_diff = dataset.nir_1 - dataset.red
                 band_sum = dataset.nir_1 + dataset.red
                 index = band_diff/band_sum
-                col = "Greens"
+                cmap_colors = ['white', 'green']
+
+                # Create a ListedColormap
+                cmap = mcolors.ListedColormap(cmap_colors)
+
+                col = cmap
             elif (ind == 'NDWI'):
                 band_diff = dataset.green - dataset.nir_1
                 band_sum = dataset.green + dataset.nir_1
                 index = band_diff / band_sum
-                col = "Blues"
+                cmap_colors = ['white', 'blue']
+
+                # Create a ListedColormap
+                cmap = mcolors.ListedColormap(cmap_colors)
+                col = cmap
             else:
                 mi = 1
                 ma = 20

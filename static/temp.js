@@ -1,3 +1,5 @@
+let currentDate = new Date();
+document.getElementsByName("todate")[0].value = currentDate.toISOString().split('T')[0]
 let navitem = document.getElementsByClassName("nav-link");
 let acc = document.getElementsByClassName("accordion");
 function act(cont) {
@@ -69,10 +71,12 @@ function performTask(lab, ind) {
       // newRow.innerHTML = rowContent;
       // head.appendChild(newRow)
       head.innerHTML = `<tr>${rowContent}</tr>`;
-      npills.insertAdjacentHTML("beforeend", `<li class="nav-item">
-    <button class="nav-link me-2 ${ind}" aria-current="page" href="#"
-    onclick="act('${ind}')">${document.getElementById(ind).innerHTML}</button>
-    </li>`);
+      if(!document.getElementsByClassName(ind)[0]){
+        npills.insertAdjacentHTML("beforeend", `<li class="nav-item">
+      <button class="nav-link me-2 ${ind}" aria-current="page" href="#"
+      onclick="act('${ind}')">${document.getElementById(ind).innerHTML}</button>
+      </li>`);
+      }
       if (ind != "ML Analysis") {
         imagedata.insertAdjacentHTML("beforeend", `<div class="accordion" id="${ind}">
       <div id="imgcont${ind.replaceAll(" ", "_")}" class="d-flex flex-row flex-wrap justify-content-between h-5" style="margin: 1.5rem 0rem;">
@@ -88,8 +92,8 @@ function performTask(lab, ind) {
         labels: labels,
         datasets: []
       };
-      chart.options.plugins.title.text = (ind == "Mangrove Analysis") ? "Mangrove Area Change" : ind;
-      chart.options.scales.y.title.text = (ind != "Mangrove Analysis") ? "Avg " + ind : "Mangrove Area";
+      chart.options.plugins.title.text = (ind == "Mangrove Analysis") ? "Mangrove Area Change(sq.km)" : document.getElementById(ind).innerHTML;
+      chart.options.scales.y.title.text = (ind != "Mangrove Analysis") ? (ind != "ML Analysis")?"Avg " + ind:"Actual Values" : "Mangrove Area (sq.km)";
       chart.update();
       taskExecuted = true;
       return;
@@ -144,7 +148,7 @@ function performTask(lab, ind) {
         y: {
           title: {
             display: true,
-            text: (ind != "Mangrove Analysis") ? "Avg " + ind : "Mangrove Area"
+            text: (ind != "Mangrove Analysis") ? (ind != "ML Analysis")?"Avg " + ind:"Actual Values" : "Mangrove Area (sq.km)"
           }
         }
 
@@ -152,7 +156,7 @@ function performTask(lab, ind) {
       plugins: {
         title: {
           display: true,
-          text: (ind == "Mangrove Analysis") ? "Mangrove Area Change" : ind
+          text: (ind == "Mangrove Analysis") ? "Mangrove Area Change(sq.km)" : document.getElementById(ind).innerHTML
         }
       }
     };
@@ -302,6 +306,7 @@ function send_req(col, send_data, drawnRectangle) {
         let newContent = `<div id="plot-container-${klm}"></div>`;
         document.getElementById("plot-container").insertAdjacentHTML("afterbegin", newContent)
         Plotly.newPlot(`plot-container-${klm}`, plotData);
+        document.getElementById(`plot-container-${klm}`).style.cssText = `border: 2px solid ${col}; margin: 5px 0px; border-radius: 5px;`
         klm++;
         appendData({
           label: `${data.area_name}`,
@@ -343,7 +348,7 @@ function send_req(col, send_data, drawnRectangle) {
           tension: 0.1
         }, data.labels)
         let newContent = `<div id="openModalBtn${count}" class="fade-out" style="${(send_data['index'] == "Mangrove Analysis") ? "" : "width:48%"}">
-        <span class="badge text-bg-primary" style="float: right; margin: 1.2rem 0rem;">${data.area},${send_data['index']}</span>
+        <span class="badge text-bg-primary" style="float: right; margin: 1.2rem 0rem;">${data.area},${document.getElementById(send_data['index']).innerHTML}</span>
         <div style="position: relative;">
         <span class="maximize-icon"><i class="bi bi-zoom-in"></i></span>
         <img src="data:image/png;base64,${data.image}"
