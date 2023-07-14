@@ -61,9 +61,17 @@ function performTask(lab, ind) {
     if (ch) {
       // Destroy the existing chart
       // ch.destroy();
+      tcont.style.display = 'block'
+      var rowContent = `<th scope="row">Analysis</th>` + `<th>Area Name</th>`;
+      for (i of lab) {
+        rowContent += `<th>${i}</th>`;
+      }
+      // newRow.innerHTML = rowContent;
+      // head.appendChild(newRow)
+      head.innerHTML = `<tr>${rowContent}</tr>`;
       npills.insertAdjacentHTML("beforeend", `<li class="nav-item">
     <button class="nav-link me-2 ${ind}" aria-current="page" href="#"
-    onclick="act('${ind}')">${ind}</button>
+    onclick="act('${ind}')">${document.getElementById(ind).innerHTML}</button>
     </li>`);
       if (ind != "ML Analysis") {
         imagedata.insertAdjacentHTML("beforeend", `<div class="accordion" id="${ind}">
@@ -88,7 +96,7 @@ function performTask(lab, ind) {
     }
     npills.insertAdjacentHTML("beforeend", `<li class="nav-item">
     <button class="nav-link active me-2 ${ind}" aria-current="page" href="#"
-    onclick="act('${ind}')">${ind}</button>
+    onclick="act('${ind}')">${document.getElementById(ind).innerHTML}</button>
     </li>`);
     if(ind != "ML Analysis"){
       imagedata.insertAdjacentHTML("beforeend", `<div class="accordion act" id="${ind}">
@@ -104,16 +112,19 @@ function performTask(lab, ind) {
     // var newRow = document.createElement('tr');
 
     // Create the HTML content for the new row
-    tcont.style.display = 'block'
-    var rowContent = `<th scope="row">Analysis</th>` + `<th>Area Name</th>`;
-    for (i of lab) {
-      rowContent += `<th>${i}</th>`;
+    // console.log(ind)
+    if(ind!=="ML Analysis"){
+      tcont.style.display = 'block'
+      var rowContent = `<th scope="row">Analysis</th>` + `<th>Area Name</th>`;
+      for (i of lab) {
+        rowContent += `<th>${i}</th>`;
+      }
+      // newRow.innerHTML = rowContent;
+      // head.appendChild(newRow)
+      head.innerHTML = `<tr>${rowContent}</tr>`;
+      // Set the HTML content of the new row
+      // newRow.innerHTML = rowContent;
     }
-    // newRow.innerHTML = rowContent;
-    // head.appendChild(newRow)
-    head.innerHTML = `<tr>${rowContent}</tr>`;
-    // Set the HTML content of the new row
-    // newRow.innerHTML = rowContent;
     mgr.style.display = "block";
     map.invalidateSize();
 

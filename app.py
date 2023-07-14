@@ -64,8 +64,9 @@ def get_area_name(latitude, longitude):
         return city_name
     else:
         return "City name not found"
-    
-def mang_ml_analysis(ds, lat_range, lon_range):
+
+
+def mang_ml_analysis(ds, times, lat_range, lon_range):
     ndvi = (ds.nir_1 - ds.red) / (ds.nir_1 + ds.red)
     mvi = ds.nir_1 - ds.green / ds.swir - ds.green
     ndvi_threshold = 0.4
@@ -73,45 +74,47 @@ def mang_ml_analysis(ds, lat_range, lon_range):
     # Create forest mask based on NDVI
     mangrove_mask_ndvi = np.where(ndvi > ndvi_threshold, 1, 0)
 
-
     mvi_threshold = 3.5
 
     # Create forest mask based on MVI within the threshold range
     mangrove_mask_mvi = np.where(mvi > mvi_threshold, 1, 0)
 
-    regular_mask= np.where(ndvi <= 0.6, True, False)
+    regular_mask = np.where(ndvi <= 0.6, True, False)
 
-    closed_mask=np.where(ndvi > 0.6, True, False)
+    closed_mask = np.where(ndvi > 0.6, True, False)
 
     mangrove = np.logical_and(mangrove_mask_ndvi, mangrove_mask_mvi)
-    regular=np.logical_and(mangrove, regular_mask)
-    closed=np.logical_and(mangrove, closed_mask)
+    regular = np.logical_and(mangrove, regular_mask)
+    closed = np.logical_and(mangrove, closed_mask)
     # Calculate the area of each pixel
     pixel_area = abs(ds.geobox.affine[0] * ds.geobox.affine[4])
     print('pixel_area', pixel_area)
 
-    data = [['day', 'month', 'year', 'mangrove','regular','closed', 'total']]
+    data = [['day', 'month', 'year', 'mangrove', 'regular', 'closed', 'total']]
 
     for i in range(mangrove.shape[0]):
         data_time = str(ndvi.time[i].values).split("T")[0]
         print(data_time)
         new_data_time = data_time.split("-")
-        
+
         # Calculate the total mangrove cover area
         mangrove_cover_area = np.sum(mangrove[i]) * pixel_area
-        regular_cover_area=np.sum(regular[i])*pixel_area
-        closed_cover_area=np.sum(closed[i])*pixel_area
+        regular_cover_area = np.sum(regular[i])*pixel_area
+        closed_cover_area = np.sum(closed[i])*pixel_area
 
         original_array = np.where(ndvi > -10, 1, 0)
         original = np.sum(original_array[i]) * pixel_area
         print()
-        data.append([new_data_time[2], new_data_time[1], new_data_time[0], mangrove_cover_area/1000000, regular_cover_area/1000000, closed_cover_area/1000000, original/1000000])
-        
+        data.append([new_data_time[2], new_data_time[1], new_data_time[0], mangrove_cover_area /
+                    1000000, regular_cover_area/1000000, closed_cover_area/1000000, original/1000000])
+
     d = open('test.txt', 'w')
     d.writelines([",".join(map(str, i))+"\n" for i in data])
     d.close()
     df = pd.DataFrame(data[1:], columns=data[0])
-    df["year-month"] = df["year"].astype('str') + "-" + df["month"].astype('str')
+    
+    df["year-month"] = df["year"].astype('str') + \
+        "-" + df["month"].astype('str')
 
     grouped_df = df.groupby(['year', 'month'])
 
@@ -132,21 +135,22 @@ def mang_ml_analysis(ds, lat_range, lon_range):
     y_pred = rf_regressor.predict(X)
     print(df, y_pred)
 
-    df["year-month"] = df["year"].astype('str') + "-" + df["month"].astype('str')
+    df["year-month"] = df["year"].astype('str') + \
+        "-" + df["month"].astype('str')
     X["year-month"] = X["year"].astype('str') + "-" + X["month"].astype('str')
 
     print("year-month done")
 
     plot_data = [
         go.Scatter(
-            x = df['year-month'],
-            y = df['mangrove']/1000000,
-            name = "Mangrove Actual"
+            x=df['year-month'][df["year-month"].isin(times)],
+            y=df['mangrove'],
+            name="Mangrove Actual"
         ),
         go.Scatter(
-            x = df['year-month'],
-            y = y_pred/1000000,
-            name = "Mangrove Predicted"
+            x=df['year-month'][df["year-month"].isin(times)],
+            y=y_pred,
+            name="Mangrove Predicted"
         )
     ]
 
@@ -174,7 +178,7 @@ def mang_ml_analysis(ds, lat_range, lon_range):
     print(area_name)
     print(data)
 
-    return {"plot": plot_json, "area_name": area_name, "points":data}
+    return {"plot": plot_json, "area_name": area_name, "points": data}
 
 
 # Flask App Initialization
@@ -283,13 +287,16 @@ def my_flask_function():
             times = labels
             ds = dc.load(**query)
             # Create a figure with subplots
-            fig, (ax_change, ax_subset1, ax_subset2) = plt.subplots(1, 3, figsize=(18, 6))
+            fig, (ax_change, ax_subset1, ax_subset2) = plt.subplots(
+                1, 3, figsize=(18, 6))
             gmw = dc.load(product='gmw_latest',
-              like=ds.geobox,
-              time='2015')
-            ds_filtered = calculate_indices(ds, index='NDVI', satellite_mission='s2')
+                          like=ds.geobox,
+                          time='2015')
+            ds_filtered = calculate_indices(
+                ds, index='NDVI', satellite_mission='s2')
             # generate median annual summaries of NDVI
-            ds_summaries = ds_filtered.NDVI.groupby("time.year").median().compute()
+            ds_summaries = ds_filtered.NDVI.groupby(
+                "time.year").median().compute()
 
             # Mask dataset to set pixels outside the GMW layer to `NaN`
             ds_summaries_masked = ds_summaries.where(gmw.mangrove.squeeze())
@@ -301,7 +308,8 @@ def my_flask_function():
 
             mangroves = xr.concat(
                 [regular_mangroves, closed_mangroves, all_mangroves],
-                dim=pd.Index(["regular", "closed", "total"], name="mangrove_type"),
+                dim=pd.Index(["regular", "closed", "total"],
+                             name="mangrove_type"),
             )
 
             total_mangroves = (mangroves.loc["total"] == 1).astype(int)
@@ -316,7 +324,7 @@ def my_flask_function():
             loss = xr.where(change == -1, -1, np.nan)
             stable = old.where(~change)
             stable = xr.where(stable == 1, 1, np.nan)
-            
+
             # fig, ax = plt.subplots(1, 3, figsize=(18, 6))
 
             ds_summaries.isel(year=0).plot.imshow(
@@ -340,7 +348,8 @@ def my_flask_function():
                 ["New mangroves", "Loss of mangroves", "Stable mangroves"],
                 loc="lower right",
             )
-            plt.title('Change in mangrove extent between {} and {}'.format(ds_summaries.year.values[0], ds_summaries.year.values[-1]));
+            plt.title('Change in mangrove extent between {} and {}'.format(
+                ds_summaries.year.values[0], ds_summaries.year.values[-1]))
 
             # Plot the subset images on the second and third subplots
             subset1 = index.isel(time=0)
@@ -363,7 +372,17 @@ def my_flask_function():
             img_base64 = base64.b64encode(img_buffer.getvalue()).decode()
             return jsonify({'image': img_base64, 'labels': labels, 'data': data, 'area': area_name})
         else:
-            a = mang_ml_analysis(dataset, lat_range, lon_range)
+            try:
+                ds1 = dc.load(product="s2a_sen2cor_granule",
+                              measurements=["red", "green",
+                                            "blue", "nir_1", "swir"],
+                              x=lon_range,
+                              y=lat_range,
+                              output_crs='EPSG:6933',
+                              resolution=(-30, 30))
+            except Exception as e:
+                return jsonify({'error': "No Data Found"})
+            a = mang_ml_analysis(ds1, [i[:7] for i in labels], lat_range, lon_range)
             return jsonify(a)
 
     # Calculate the components that make up the NDVI calculation
