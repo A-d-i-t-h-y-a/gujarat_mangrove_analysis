@@ -194,6 +194,37 @@ def home():
 
 # Route for making Data Requests
 
+@app.route('/data', methods=['GET','POST'])
+def data():
+    if request.method == "POST":
+        # Create a Data Cube instance
+        dc = datacube.Datacube(app='datacube-example')
+
+        # Define the product and query parameters
+        product_name = ['s2a_sen2cor_granule','s2b_sen2cor_granule']
+        # query = {'time': ('01-01-2023', '01-07-2023')}
+
+        p = []
+
+    # Search for datasets
+        for j in product_name:
+            datasets = dc.find_datasets(product=j)
+
+            # Check if datasets exist
+            d = []
+            if len(datasets) == 0:
+                print('No datasets found for the specified query parameters.')
+            else:
+                # Retrieve the dataset location
+                for i in datasets:
+                    ds_loc = i.metadata_doc['geometry']['coordinates']
+                    d.append(ds_loc)
+            # my_list = [1, 2, 3, 2, 4, 3, 5, 6, 5]
+            unique_list = [x for i, x in enumerate(d) if x not in d[:i]]
+            p+=unique_list
+        unique_list = [x for i, x in enumerate(p) if x not in p[:i]]
+        return jsonify({'data':unique_list})
+
 
 @app.route('/my_flask_route', methods=['GET', 'POST'])
 def my_flask_function():

@@ -435,6 +435,44 @@ var count = 0
 
 let map = L.map('map').setView([22.5, 69.9], 9);
 
+fetch('/data', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
+  .then(response => response.json())
+  .then(data => {
+    // for(let i in data){
+    //   console.log(i)
+    // }
+    console.log(data.data)
+    for(let i of data.data){
+      // var polygonCoords = [
+      //   [[80.06369921260253, 16.278761841360236],
+      //    [81.09135078500897, 16.280813604615744],
+      //    [81.09090724198668, 15.288158060683616],
+      //    [80.06824451551739, 15.286237505336244],
+      //    [80.06369921260253, 16.278761841360236]]
+      // ];
+      
+      // Create a Leaflet polygon
+      var reversedCoords = i.map(function(arr) {
+        return arr.map(function(coord) {
+            return [coord[1], coord[0]];
+        });
+    });
+      var polygon = L.polygon(reversedCoords, {color: 'blue'}).addTo(map);
+      
+      // Fit the map bounds to the polygon
+      map.fitBounds(polygon.getBounds());
+    }
+  }).catch(error => {
+    document.getElementById("loader").classList.add("d-none");
+    displayalert("An Error Occured While Fetching Data")
+    console.log('An error occurred:', error);
+  });
+
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
